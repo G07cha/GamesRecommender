@@ -1,0 +1,19 @@
+{
+  "name": "recommender",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "./node_modules/.bin/nodemon ."
+  },
+  "author": "g07cha <azizovkostya97@gmail.com>",
+  "private": true,
+  "dependencies": {
+    "co": "^4.6.0",
+    "console-log-level": "^1.4.0",
+    "kue": "^0.11.5",
+    "lodash": "^4.17.4",
+    "nodemon": "^1.11.0",
+    "pg": "^6.1.2",
+    "sequelize": "^3.30.0"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "game-recommendations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:server": "./node_modules/.bin/nodemon .",
+    "start:recommender": "cd services/recommender && npm start",
+    "start:recommender": "cd services/crawler && npm start",
+    "db:migrate": "sequelize db:migrate"
+  },
+  "private": true,
+  "author": "g07cha <azizovkostya97@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "co": "^4.6.0",
+    "console-log-level": "^1.4.0",
+    "dotenv": "^2.0.0",
+    "hapi": "^16.1.0",
+    "lodash": "^4.17.4",
+    "pg": "^6.1.2",
+    "sequelize": "^3.28.0"
+  }
+}
