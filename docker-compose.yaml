@@ -10,6 +10,18 @@ recommender:
     - DASHBOARD_PORT=3000
   ports:
     - "3000:3000"
+ui:
+  build: ./services/ui
+  volumes:
+    - ./shared:/usr/src/app/shared
+    - ./services/ui:/usr/src/app
+  links:
+    - redis
+    - db
+  environment:
+    - PORT=8000
+  ports:
+    - "8000:8000"
 redis:
   image: redis
   ports:
