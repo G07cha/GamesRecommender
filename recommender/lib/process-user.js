@@ -1,7 +1,7 @@
 const { wrap } = require('co');
 const _ = require('lodash');
 
-const log = global.log || console;
+const log = require('./logger');
 const { mapping } = require('./utils');
 const Recommender = require('./recommender');
 const { User, Playtime, Recommendation } = require('../shared/models');

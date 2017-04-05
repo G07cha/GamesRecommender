@@ -7,7 +7,7 @@ const exphbs  = require('express-handlebars');
 const expressStatusMonitor = require('express-status-monitor');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const { sequelize } = require('./shared/models');
+const cookieParser = require('cookie-parser')
 
 const config = require('./config');
 const routes = require('./routes');
@@ -29,6 +29,7 @@ app.use(bodyParser.json(config.bodyParser.json));
 app.use(bodyParser.urlencoded(config.bodyParser.urlencoded));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cookieParser());
 
 // Mount routes
 app.use('/', routes);
@@ -36,8 +37,6 @@ app.use('/', routes);
 /**
  * Start Express server.
  */
-sequelize.authenticate().then(function() {
-  app.listen(app.get('port'));
-});
+app.listen(app.get('port'));
 
 module.exports = app;

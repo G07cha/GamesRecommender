@@ -1,0 +1,22 @@
+{
+  "name": "db-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "./node_modules/.bin/nodemon index.js",
+    "db:migrate": "sequelize db:migrate"
+  },
+  "author": "g07cha <azizovkostya97@gmail.com>",
+  "private": true,
+  "dependencies": {
+    "co": "^4.6.0",
+    "console-log-level": "^1.4.0",
+    "dotenv": "^2.0.0",
+    "hapi": "^16.1.0",
+    "lodash": "^4.17.4",
+    "nodemon": "^1.11.0",
+    "pg": "^6.1.2",
+    "sequelize": "^3.28.0"
+  }
+}

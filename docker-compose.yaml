@@ -1,32 +1,44 @@
-recommender:
-  build: ./services/recommender
-  volumes:
-    - ./shared:/usr/src/app/shared
-    - ./services/recommender:/usr/src/app
-  links:
-    - redis
-    - db
-  environment:
-    - DASHBOARD_PORT=3000
-  ports:
-    - "3000:3000"
-ui:
-  build: ./services/ui
-  volumes:
-    - ./shared:/usr/src/app/shared
-    - ./services/ui:/usr/src/app
-  links:
-    - redis
-    - db
-  environment:
-    - PORT=8000
-  ports:
-    - "8000:8000"
-redis:
-  image: redis
-  ports:
-    - "6379"
-db:
-  image: postgres
-  ports:
-    - "5432"
+version: '3'
+
+services:
+  recommender:
+    build: ./recommender
+    volumes:
+      - ./recommender:/usr/src/app
+    links:
+      - redis
+      - db-manager
+    environment:
+      - DASHBOARD_PORT=3000
+  ui:
+    build: ./ui
+    volumes:
+      - ./ui:/usr/src/app
+    links:
+      - db-manager:db-manager
+    env_file: config.env
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
+  db-manager:
+    build: ./db-manager
+    volumes:
+      - ./db-manager:/usr/src/app
+    links:
+      - db:db
+    depends_on:
+      - db
+    env_file: config.env
+    ports:
+      - "3000:3000"
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379"
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"

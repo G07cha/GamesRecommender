@@ -1,4 +1,7 @@
 <form class="main-form" action="/games" method="post">
+  <p class="error">
+    {{error}}
+  </p>
   <label for="value" class="label">Enter your steam name:</label>
   <input type="text" class="input" name="value" id="valueInput">
   <button type="submit" class="button positive" id="submitBtn">Get recommendations</button>

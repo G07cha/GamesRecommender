@@ -1,13 +1,9 @@
-const kue = require('kue');
-const _ = require('lodash');
-global.log = require('console-log-level')({
-  prefix: function (level) {
-    return new Date().toISOString() + ' [Recommender]'
-  },
-  level: process.env.LOG || 'info'
-});
+'use strict';
 
-const { sequelize, User, Recommendation } = require('./shared/models');
+const kue = require('kue');
+
+const log = require('./lib/logger');
+const { sequelize, User } = require('./shared/models');
 const processUser = require('./lib/process-user');
 
 let queue = kue.createQueue({

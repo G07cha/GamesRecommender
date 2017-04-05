@@ -1,6 +1,5 @@
 const _ = require('lodash');
-const log = global.log || console;
-const similarityCoef = 1;
+const log = require('./logger');
 
 class Recommender {
   constructor(target, alghorithm = 'default') {
@@ -40,8 +39,8 @@ class Recommender {
 
     _.assignWith(
       this.recommendations, newRecommendations, function(val, newVal) {
-      return _.floor(_.isUndefined(val) ? newVal : val + newVal);
-    });
+        return _.floor(_.isUndefined(val) ? newVal : val + newVal);
+      });
   }
 
   getRecommendations() {
