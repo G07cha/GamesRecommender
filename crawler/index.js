@@ -1,85 +1,43 @@
-require('dotenv').config();
+'use strict';
 
-const log = require('console-log-level')({
-  prefix: function (level) {
-    return new Date().toISOString() + ' [Crawler]'
-  },
-  level: process.env.LOG || 'info'
-});
-const { sequelize, User, Playtime, App } = require('../../shared/models');
-const Queue = require('./lib/queue');
-const SteamAPI = require('./lib/steam-api');
+const config = require('./config');
 
-const steamAPI = new SteamAPI();
-const queue = new Queue({
-  delay: 4000,
-  unique: true
-});
+const express = require('express');
+const bodyParser = require('body-parser');
+const Crawler = require('./lib/crawler');
+const { sequelize } = require('./models');
+const log = require('console-log-level')(config.log);
 
-queue.setExecutor(function(steamID64) {
-  let newUser, allApps;
+const crawler = new Crawler();
+const app = express();
 
-  return User.findOne({
-    where: { steamID64 }
-  }).then(function(user) {
-    if(user) {
-      throw new Error(`User with id ${steamID64} already exists in DB, skipping`);
-    }
+app.set('port', process.env.PORT || config.defaultPort);
+app.set('env', process.env.MODE || config.defaultMode);
 
-    return User.create({ steamID64 });
-  }).then(function(user) {
-    newUser = user;
-    return steamAPI.getUserApps(user.steamID64);
-  }).then(function(apps) {
-    allApps = apps = apps.filter((app) => app.playtimeForever > 60);
+app.use(bodyParser.json(config.bodyParser.json));
+app.use(config.versionPrefix, require('./lib/api'));
 
-    return App.findAll({
-      where: {
-        appId: apps.map((app) => app.appId)
-      }
-    }).then(function(appsInDB) {
-      return Promise.all(apps.map(function(app) {
-        let appInDB = appsInDB.find(function(a) {
-          return app.appId === a.appId;
-        });
+sequelize.authenticate().then(function() {
+  return sequelize.sync();
+}).then(function() {
+  log.info('Crawler is started');
 
-        if(appInDB) {
-          return appInDB;
-        } else {
-          return App.create({
-            appId: app.appId
-          });
-        }
-      }));
-    });
-  }).then(function(createdApps) {
-    let playtimes = allApps.map(function(app) {
-      return {
-          value: app.playtimeForever,
-          userId: newUser.get('id'),
-          appId: createdApps.find((a) => a.get('appId') === app.appId).get('id')
-      };
-    });
+  crawler.addTask('76561198051910230');
+  crawler.start();
+  let server = app.listen(function() {
+    let host = server.address().address,
+      port = server.address().port;
 
-    return Playtime.bulkCreate(playtimes);
-  }).then(function() {
-    return steamAPI.getFriends(newUser.get('steamID64'));
-  }).then(function(friends) {
-    friends.forEach(function(friend) {
-      queue.addTask(friend.steamid);
-    });
-  }).catch(function(error) {
-    log.error(error.message);
+    log.info('API running at:', host, port);
   });
+}).catch(function(err) {
+  log.error('Unable to connect to the DB', err);
 });
 
 process.on('SIGINT', function() {
-  log.warning("Caught interrupt signal");
+  log.warning('Caught interrupt signal');
 
-  queue.stop().then(function() {
+  crawler.stop().then(function() {
     process.exit();
   });
 });
-
-queue.addTask('76561198051910230');
-queue.start();

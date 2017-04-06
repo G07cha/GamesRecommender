@@ -1,5 +1,5 @@
 const log = require('console-log-level')({
-  prefix: function (level) {
+  prefix: function() {
     return new Date().toISOString() + ' [Queue]'
   },
   level: process.env.LOG || 'info'

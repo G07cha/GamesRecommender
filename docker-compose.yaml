@@ -7,38 +7,36 @@ services:
       - ./recommender:/usr/src/app
     links:
       - redis
-      - db-manager
     environment:
       - DASHBOARD_PORT=3000
+  recommender-db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+  crawler:
+    build: ./crawler
+    env_file: ./crawler/.env
+    volumes:
+      - ./crawler:/usr/src/app
+    depends_on:
+      - crawler-db
+    links:
+      - crawler-db
+  crawler-db:
+    image: postgres
+    restart: always
   ui:
     build: ./ui
     volumes:
       - ./ui:/usr/src/app
-    links:
-      - db-manager:db-manager
     env_file: config.env
     environment:
       - PORT=8000
     ports:
       - "8000:8000"
-  db-manager:
-    build: ./db-manager
-    volumes:
-      - ./db-manager:/usr/src/app
-    links:
-      - db:db
-    depends_on:
-      - db
-    env_file: config.env
-    ports:
-      - "3000:3000"
   redis:
     image: redis
     restart: always
     ports:
       - "6379"
-  db:
-    image: postgres
-    restart: always
-    ports:
-      - "5432:5432"

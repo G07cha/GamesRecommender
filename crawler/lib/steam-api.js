@@ -1,6 +1,8 @@
+'use strict';
+
 const SteamApi = require('steam-api');
 const log = require('console-log-level')({
-  prefix: function (level) {
+  prefix: function () {
     return new Date().toISOString() + ' [Steam]'
   },
   level: process.env.LOG || 'info'
@@ -42,12 +44,20 @@ class SteamAPI {
 
   getFriends(userId, relationship = 'all') {
     log.debug('Getting friends for', userId);
-    return this._user.GetFriendList(relationship, userId);
+    this._user.setMethod('GetFriendList');
+    this._user.setVersion(1);
+
+    return this._user.setupClient({
+      steamId: userId,
+      relationship: relationship
+    }).then(function(resp) {
+      return resp.data.friendslist.friends.map((f) => f.steamid);
+    });
   }
 
   getAppDetails(appId) {
     log.debug('Getting app details for', appId);
-    return app.appDetails(appId);
+    return this._app.appDetails(appId);
   }
 }
 
