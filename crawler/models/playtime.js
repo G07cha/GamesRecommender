@@ -2,7 +2,7 @@
 module.exports = function(sequelize, DataTypes) {
   var Playtime = sequelize.define('Playtime', {
     appId: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER,
+    userId: DataTypes.STRING,
     value: DataTypes.INTEGER
   }, {
     classMethods: {

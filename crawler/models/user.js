@@ -4,7 +4,8 @@ module.exports = function(sequelize, DataTypes) {
     steamID64: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false
+      allowNull: false,
+      primaryKey: true
     }
   }, {
     classMethods: {
