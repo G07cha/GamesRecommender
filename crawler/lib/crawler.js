@@ -7,6 +7,7 @@ const SteamAPI = require('./steam-api');
 const log = require('console-log-level')(config.log);
 
 const steamAPI = new SteamAPI();
+const MINIMAL_PLAYTIME = 60; // 2 hours
 
 class Crawler {
   constructor() {
@@ -36,27 +37,29 @@ class Crawler {
         newUser = user;
         return steamAPI.getUserApps(user.steamID64);
       }).then(function(apps) {
-        allApps = apps = apps.filter((app) => app.playtimeForever > 60);
+        allApps = apps.filter((app) => app.playtimeForever > MINIMAL_PLAYTIME);
 
         return App.findAll({
           where: {
-            appId: apps.map((app) => app.appId)
+            appId: allApps.map((app) => app.appId)
           }
-        }).then(function(appsInDB) {
-          return Promise.all(apps.map(function(app) {
-            let appInDB = appsInDB.find(function(a) {
-              return app.appId === a.appId;
-            });
-
-            if(appInDB) {
-              return appInDB;
-            } else {
-              return App.create({
-                appId: app.appId
-              });
-            }
-          }));
         });
+      }).then(function(appsInDB) {
+        return Promise.all(allApps.map(function(app) {
+          let appInDB = appsInDB.find(function(a) {
+            return app.appId === a.appId;
+          });
+
+          if(appInDB) {
+            return appInDB;
+          } else {
+            return App.create({
+              appId: app.appId,
+              name: app.name,
+              logoUrl: app.logo
+            });
+          }
+        }));
       }).then(function(createdApps) {
         let playtimes = allApps.map(function(app) {
           return {

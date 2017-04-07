@@ -5,8 +5,11 @@ module.exports = function(sequelize, DataTypes) {
     appId: {
       type: DataTypes.INTEGER,
       unique: true,
-      allowNull: false
+      allowNull: false,
+      primaryKey: true
     },
+    name: DataTypes.STRING,
+    logoUrl: DataTypes.STRING
   }, {
     timestamps: false,
     classMethods: {
