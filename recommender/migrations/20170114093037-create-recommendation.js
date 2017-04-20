@@ -26,7 +26,7 @@ module.exports = {
       },
       priority: {
         type: Sequelize.INTEGER
-      }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -37,7 +37,7 @@ module.exports = {
       }
     });
   },
-  down: function(queryInterface, Sequelize) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Recommendations');
   }
 };
