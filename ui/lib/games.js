@@ -1,25 +1,22 @@
-const DBAPI = require('./db-api.js');
+const RecommenderAPI = require('./recommender-api.js');
+const CrawlerAPI = require('./crawler-api.js');
 
 class UserGames {
-  constructor(steamID64) {
-    if(!steamID64) {
+  constructor(id) {
+    if(!id) {
       throw new Error('Steam ID is not specified');
     }
-
-    this.user = DBAPI.query('user', {
-      where: { steamID64 }
-    });
+    this.id = id;
   }
 
-  get(page = 0, perPage = 10) {
-    return this.user.then(function(user) {
-      return DBAPI.queryAll('recommendation', {
-        where: {
-          userId: user.id
-        },
-        offset: perPage * page,
-        limit: perPage
-      });
+  get(page = 0, count = 10) {
+    return RecommenderAPI.getRecommendationList({
+      offset: page * count,
+      count
+    }).then(function(recommendations) {
+      return Promise.all(recommendations.map(function(r) {
+        return CrawlerAPI.getApp(r.appId);
+      }));
     });
   }
 }

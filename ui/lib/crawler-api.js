@@ -1,13 +1,14 @@
 const request = require('request-promise-native');
 const { resolve } = require('url');
 
-const ENDPOINT = 'http://crawler/v1';
+const ENDPOINT = 'http://crawler/v1/';
 const PATHS = {
-  user: '/users/',
-  userList: '/users',
-  userListExcl: '/users/not',
-  app: '/apps/',
-  appList: '/apps',
+  user: 'users/',
+  userList: 'users',
+  playtime: 'playtimes/',
+  playtimeList: 'playtimes',
+  app: 'apps/',
+  appList: 'apps',
 }
 
 const CrawlerAPI = {
@@ -17,11 +18,11 @@ const CrawlerAPI = {
   getUserList: function(params = {}) {
     return resource('userList').setParams(params).send();
   },
-  getUserListWithExclude(id, params = {}) {
-    return resource('userListExcl', id).setParams(params).send();
-  },
   getPlaytimeList: function(params = {}) {
     return resource('playtimeList').setParams(params).send();
+  },
+  getApp: function(id, params) {
+    return resource('app', id).setParams(params).send();
   },
   appList: function(params = {}) {
     return resource('appList').setParams(params).send();
@@ -37,12 +38,21 @@ function resource(name, id) {
 
   this.setParams = function(parameters) {
     params = parameters;
+    return this;
   }
 
-  this.send = function() {
+  this.send = function(additionalData = {}) {
     const json = true;
-    return request.get({url, params, json});
+    let data = {
+      url, params, json
+    };
+
+    data = Object.assign(additionalData, data);
+
+    return request.get(data);
   }
+
+  return this;
 }
 
 module.exports = CrawlerAPI;

@@ -1,11 +1,10 @@
 <div class="game-list">
   {{#each games}}
-  <a href="http://store.steampowered.com/app/{{app.id}}">
+  <a href="http://store.steampowered.com/app/{{id}}" target="_blank">
     <div class="game">
-      <h3 class="name">{{app.name}}</h3>
-      <img class="logo" src="{{app.logo}}"/>
-      <span class="description">{{app.desc}}</span>
-      <a href="http://store.steampowered.com/app/{{app.id}}">
+      <h3 class="name">{{name}}</h3>
+      <img class="logo" src="{{logoUrl}}"/>
+      <a href="http://store.steampowered.com/app/{{id}}" class="show-btn" target="_blank">
         <button class="btn primary">Show</button>
       </a>
     </div>
