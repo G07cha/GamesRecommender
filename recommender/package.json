@@ -3,17 +3,22 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ."
+    "start": "./node_modules/.bin/nodemon -L ."
   },
   "author": "g07cha <azizovkostya97@gmail.com>",
   "private": true,
   "dependencies": {
+    "body-parser": "^1.17.1",
     "co": "^4.6.0",
     "console-log-level": "^1.4.0",
+    "epilogue": "^0.7.1",
+    "express": "^4.15.2",
     "kue": "^0.11.5",
     "lodash": "^4.17.4",
     "nodemon": "^1.11.0",
-    "pg": "^6.1.2",
-    "sequelize": "^3.30.0"
+    "pg": "^6.1.5",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.3",
+    "sequelize": "^3.30.4"
   }
 }

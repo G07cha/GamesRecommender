@@ -3,13 +3,15 @@
 const kue = require('kue');
 
 const log = require('./lib/logger');
-const { sequelize, User } = require('./shared/models');
+const { sequelize } = require('./models');
 const processUser = require('./lib/process-user');
+const CrawlerAPI = require('./lib/crawler-api');
 
 let queue = kue.createQueue({
+  prefix: 'r',
   redis: {
     port: process.env.REDIS_PORT_6379_TCP_PORT,
-    host: process.env.REDIS_PORT_6379_TCP_ADDR
+    host: 'redis'
   }
 });
 
@@ -32,6 +34,8 @@ process.once('SIGTERM', function () {
 });
 
 sequelize.authenticate().then(function() {
+  return sequelize.sync();
+}).then(function () {
   if(process.env.DASHBOARD_PORT) {
     log.info('Dashboard available at:', process.env.DASHBOARD_PORT)
     kue.app.listen(process.env.DASHBOARD_PORT);
@@ -50,17 +54,14 @@ sequelize.authenticate().then(function() {
     return [];
   }
 
-  return User.findAll({
-    where: { id: 1 }
-    // having: ['COUNT("Recommendations".id) = 0'],
-    // group: ['User.id', 'Recommendations.id'],
-    // include: [Recommendation]
-  });
+  return CrawlerAPI.getUserList();
 }).then(function(users) {
   users.forEach(function(user) {
+    let id = user.id;
+
     queue.create('recommendation', {
-      title: 'Processing ' + user.id,
-      id: user.id
+      title: 'Processing ' + id,
+      id
     }).priority('low').save();
   });
 }).catch(log.error);

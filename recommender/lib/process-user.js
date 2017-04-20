@@ -4,20 +4,16 @@ const _ = require('lodash');
 const log = require('./logger');
 const { mapping } = require('./utils');
 const Recommender = require('./recommender');
-const { User, Playtime, Recommendation } = require('../shared/models');
+const { Recommendation } = require('../models');
+const CrawlerAPI = require('./crawler-api');
 
 module.exports = wrap(function* (userId) {
-  if(typeof userId !== 'number') {
+  if(typeof userId !== 'string') {
     throw new TypeError(`Expected 'userId' as number but recieved ${typeof userId}`);
   }
   let recommender = new Recommender();
 
-  let user = yield User.findOne({
-    where: {
-      id: userId
-    },
-    include: [ Playtime ]
-  });
+  let user = yield CrawlerAPI.getUser(userId);
 
   if(!user) {
     throw new Error(`Unable to find user with id: "${userId}"`);
@@ -30,20 +26,14 @@ module.exports = wrap(function* (userId) {
   // Go through all users with playtimes and get recommendations
   log.debug('Processing all users');
   let step = 1000;
-  let query = {
-    where: {
-      id: {
-        $not: userId
-      }
-    },
-    include: [ Playtime ],
+  let options = {
     limit: step
   };
 
-  let usersCount = yield User.count(query);
+  let usersCount = yield CrawlerAPI.getUserCount();
 
-  for(query.offset = 0; query.offset < usersCount; query.offset += step) {
-    let users = yield User.findAll(query);
+  for(options.offset = 0; options.offset < usersCount - 1; options.offset += step) {
+    let users = yield CrawlerAPI.getUserListWithExclude(userId, options);
     users = users.map(function(user) {
       return mapping(user.Playtimes, 'appId', 'value');
     });
