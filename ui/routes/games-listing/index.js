@@ -8,6 +8,7 @@ function gameListingHandler(req, res) {
     let gameList = new UserGames(steamId);
     return gameList.get();
   }).then(function(games) {
+    console.log(games);
     res.render('games-listing', { games });
   }).catch(function(error) {
     res.status(500).render('home', {

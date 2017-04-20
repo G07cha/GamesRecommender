@@ -3,7 +3,7 @@ const DBAPI = require('./db-api.js');
 class UserGames {
   constructor(steamID64) {
     if(!steamID64) {
-      throw new Error('steamId is not specified');
+      throw new Error('Steam ID is not specified');
     }
 
     this.user = DBAPI.query('user', {
@@ -17,7 +17,8 @@ class UserGames {
         where: {
           userId: user.id
         },
-        offset: perPage * page
+        offset: perPage * page,
+        limit: perPage
       });
     });
   }
