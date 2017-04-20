@@ -4,12 +4,8 @@ module.exports = {
     return queryInterface.createTable('Users', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        unique: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      steamID64: {
-        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {
@@ -22,7 +18,7 @@ module.exports = {
       }
     });
   },
-  down: function(queryInterface, Sequelize) {
+  down: function(queryInterface) {
     return queryInterface.dropTable('Users');
   }
 };

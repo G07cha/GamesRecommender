@@ -1,3 +1,4 @@
+const kue = require('kue');
 const log = require('console-log-level')({
   prefix: function() {
     return new Date().toISOString() + ' [Queue]'
@@ -5,15 +6,25 @@ const log = require('console-log-level')({
   level: process.env.LOG || 'info'
 })
 
-let _interval = new WeakMap();
-
 class Queue {
   constructor(settings = {
     delay: 0,
     unique: false
   }) {
     this.settings = settings;
+    this.settings.prefix = 'c';
+    this.settings.redis = {
+      port: process.env.REDIS_PORT_6379_TCP_PORT,
+      host: 'redis'
+    }
     this.tasks = [];
+    this.q = kue.createQueue(settings);
+
+    // Create WebUI
+    if(process.env.DASHBOARD_PORT) {
+      kue.app.listen(process.env.DASHBOARD_PORT);
+    }
+
     log.debug('Created with following settings:', this.settings);
   }
 
@@ -22,43 +33,36 @@ class Queue {
   }
 
   addTask(task) {
-    if(this.settings.unique && this.tasks.find((t) => t === task)) {
+    if(this.tasks.find((t) => t === task)) {
       return;
     }
 
-    this.tasks.push(task);
+    this.q.create('crawl', task).save();
   }
 
   start() {
-    if(_interval.has(this) || !this.executor) {
-      log.warn('Can\'t start, either interval is already running or executor is not set')
+    if(!this.executor) {
+      log.warn('Can\'t start, either it is already running or executor is not set')
       return;
     }
 
-    let interval = setInterval(() => {
-      log.debug('Running iteration');
-
-      if(this.tasks.length === 0) {
-        log.debug('Tasklist is empty');
-        this.stop();
-      }
-
-      this._currentTask = this.executor(
-        this.tasks.shift()
-      );
-    }, this.settings.delay);
-
-    _interval.set(this, interval);
+    this.q.process('crawl', this.executor);
     log.debug('Queue is started');
   }
 
   stop() {
     log.debug('Stopping');
-    clearInterval(_interval.get(this));
-    _interval.delete(this);
-    log.debug('Stopped');
 
-    return this._currentTask;
+    return new Promise(function(resolve, reject) {
+      this.q.shutdown(60000, function(err = '') {
+        log.debug('Stopped', err);
+
+        if(err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
   }
 }
 

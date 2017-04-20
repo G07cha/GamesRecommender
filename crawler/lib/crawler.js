@@ -18,64 +18,67 @@ class Crawler {
 
     this.queue = queue;
 
-    this.queue.setExecutor(function(steamID64) {
-      let newUser, allApps;
+    this.queue.setExecutor(function(job, done) {
+      let newUser, allApps,
+        id = job.data;
 
-      if(!steamID64) {
+      if(!id) {
         return;
       }
 
       return User.findOne({
-        where: { steamID64 }
+        where: { id }
       }).then(function(user) {
         if(user) {
-          throw new Error(`User with id ${steamID64} already exists in DB, skipping`);
+          throw new Error(`User with id ${id} already exists in DB, skipping`);
         }
 
-        return User.create({ steamID64 });
+        return User.create({ id });
       }).then(function(user) {
         newUser = user;
-        return steamAPI.getUserApps(user.steamID64);
+        return steamAPI.getUserApps(user.id);
       }).then(function(apps) {
         allApps = apps.filter((app) => app.playtimeForever > MINIMAL_PLAYTIME);
 
         return App.findAll({
           where: {
-            appId: allApps.map((app) => app.appId)
+            id: allApps.map((app) => app.appId)
           }
         });
       }).then(function(appsInDB) {
         return Promise.all(allApps.map(function(app) {
           let appInDB = appsInDB.find(function(a) {
-            return app.appId === a.appId;
+            return app.appId === a.id;
           });
 
           if(appInDB) {
             return appInDB;
           } else {
             return App.create({
-              appId: app.appId,
+              id: app.appId,
               name: app.name,
               logoUrl: app.logo
             });
           }
         }));
-      }).then(function(createdApps) {
+      }).then(function(appsInDB) {
         let playtimes = allApps.map(function(app) {
           return {
             value: app.playtimeForever,
             userId: newUser.get('id'),
-            appId: createdApps.find((a) => a.get('appId') === app.appId).get('id')
+            appId: appsInDB.find((a) => a.get('id') === app.appId).get('id')
           };
         });
 
         return Playtime.bulkCreate(playtimes);
       }).then(function() {
-        return steamAPI.getFriends(newUser.get('steamID64'));
+        return steamAPI.getFriends(newUser.get('id'));
       }).then(function(friends) {
         friends.forEach((friend) => queue.addTask(friend));
+        done();
       }).catch(function(error) {
         log.error('Error:', error);
+        done(error);
       });
     });
   }

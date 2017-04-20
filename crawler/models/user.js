@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define('User', {
-    steamID64: {
+    id: {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,

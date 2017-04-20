@@ -11,7 +11,6 @@ const log = require('console-log-level')(config.log);
 const crawler = new Crawler();
 const app = express();
 
-app.set('port', process.env.PORT || config.defaultPort);
 app.set('env', process.env.MODE || config.defaultMode);
 
 app.use(bodyParser.json(config.bodyParser.json));
@@ -22,17 +21,16 @@ sequelize.authenticate().then(function() {
 }).then(function() {
   log.info('Crawler is started');
 
-  crawler.addTask('76561198051910230');
-  crawler.start();
-  let server = app.listen(function() {
+  // Sample initial point
+  // crawler.addTask('76561198070651671');
+  // crawler.start();
+  let server = app.listen(process.env.PORT || config.defaultPort, function() {
     let host = server.address().address,
       port = server.address().port;
 
     log.info('API running at:', host, port);
   });
-}).catch(function(err) {
-  log.error('Unable to connect to the DB', err);
-});
+}).catch(log.error);
 
 process.on('SIGINT', function() {
   log.warning('Caught interrupt signal');

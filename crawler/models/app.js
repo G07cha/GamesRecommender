@@ -2,7 +2,7 @@
 
 module.exports = function(sequelize, DataTypes) {
   let App = sequelize.define('App', {
-    appId: {
+    id: {
       type: DataTypes.INTEGER,
       unique: true,
       allowNull: false,
