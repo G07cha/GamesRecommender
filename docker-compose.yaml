@@ -3,17 +3,19 @@ version: '3'
 services:
   recommender:
     build: ./recommender
+    env_file: ./recommender/.env
     volumes:
       - ./recommender:/usr/src/app
+    ports:
+      - "3000:3000"
     links:
       - redis
+      - crawler
     environment:
       - DASHBOARD_PORT=3000
   recommender-db:
     image: postgres
     restart: always
-    ports:
-      - "5432:5432"
   crawler:
     build: ./crawler
     env_file: ./crawler/.env
@@ -21,8 +23,10 @@ services:
       - ./crawler:/usr/src/app
     depends_on:
       - crawler-db
+      - redis
     links:
       - crawler-db
+      - redis
   crawler-db:
     image: postgres
     restart: always
@@ -35,8 +39,9 @@ services:
       - PORT=8000
     ports:
       - "8000:8000"
+    links:
+      - crawler
+      - recommender
   redis:
     image: redis
     restart: always
-    ports:
-      - "6379"
