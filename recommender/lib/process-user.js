@@ -11,8 +11,8 @@ module.exports = wrap(function* (userId) {
   if(typeof userId !== 'string') {
     throw new TypeError(`Expected 'userId' as number but recieved ${typeof userId}`);
   }
-  let recommender = new Recommender();
 
+  let recommender = new Recommender();
   let user = yield CrawlerAPI.getUser(userId);
 
   if(!user) {
@@ -50,5 +50,32 @@ module.exports = wrap(function* (userId) {
     };
   });
 
-  return Recommendation.bulkCreate(recommendations);
+  let existingRecords = yield Recommendation.findAll({
+    where: {
+      appId: recommendations.map((r) => r.appId),
+      userId: userId
+    }
+  });
+
+  let [recommendsToUpdate, recommendsToCreate] = _.partition(recommendations,
+    function(recommendation) {
+      return existingRecords.find((existing) => {
+        return existing.appId === recommendation.appId
+      });
+    });
+
+  return Promise.all([
+    Recommendation.bulkCreate(recommendsToCreate),
+    recommendsToUpdate.map(function(recommendation) {
+      let record = existingRecords.find((existing) => {
+        return existing.appId === recommendation.appId
+      });
+
+      if(record.priority !== recommendation.priority) {
+        return record.update({
+          priority: recommendation.priority
+        });
+      }
+    }).filter(Boolean)
+  ]);
 });
