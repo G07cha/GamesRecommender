@@ -2,7 +2,7 @@
 
 const config = {
   versionPrefix: '/v1',
-  defaultPort: 3000,
+  defaultPort: 80,
   defaultHost: '0.0.0.0',
   db: {
     'development': {
