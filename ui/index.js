@@ -9,11 +9,12 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 
+const log = require('./lib/logger');
 const config = require('./config');
 const routes = require('./routes');
 
 const app = express();
-const hbs = exphbs.create();
+const hbs = exphbs.create({defaultLayout: 'main'});
 
 app.engine('handlebars', hbs.engine);
 
@@ -22,6 +23,7 @@ app.set('env', process.env.MODE || config.defaultMode);
 app.set('views', config.views.path);
 app.set('view engine', 'handlebars');
 
+app.use(express.static('assets'));
 app.use(expressStatusMonitor());
 app.use(compression());
 app.use(logger(config.logger.type));
@@ -37,6 +39,8 @@ app.use('/', routes);
 /**
  * Start Express server.
  */
-app.listen(app.get('port'));
+app.listen(app.get('port'), function() {
+  log.info('Server is started at ', app.get('port'));
+});
 
 module.exports = app;
