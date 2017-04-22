@@ -15,3 +15,13 @@
     </div>
   {{/each}}
 </div>
+<div class="pagination">
+  {{#if prevPage}}
+  <a href="/games?page={{prevPage}}">
+    <button class="btn">Previous page</button>
+  </a>
+  {{/if}}
+  <a href="games?page={{nextPage}}">
+    <button class="btn">Next page</button>
+  </a>
+</div>

@@ -9,10 +9,10 @@ class UserGames {
     this.id = id;
   }
 
-  get(page = 0, count = 10) {
+  get(page = 1, count = 10) {
     return RecommenderAPI.getRecommendationList({
       userId: this.id,
-      offset: page * count,
+      offset: (page - 1) * count,
       count
     }).then(function(recommendations) {
       return Promise.all(recommendations.map(function(r) {

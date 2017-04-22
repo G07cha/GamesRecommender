@@ -5,11 +5,18 @@ const UserGames = require('../../lib/games');
 const log = require('../../lib/logger');
 
 function gameListingHandler(req, res) {
+  let page = parseInt(req.query.page) || 1;
+  let nextPage = page + 1;
+  let prevPage;
+  if(page > 1) {
+    prevPage = page - 1;
+  }
+
   getSteamId(req, res).then(function(steamId) {
     let gameList = new UserGames(steamId);
-    return gameList.get();
+    return gameList.get(page);
   }).then(function(games) {
-    res.render('games-listing', { games });
+    res.render('games-listing', { nextPage, prevPage, games });
   }).catch(function(error) {
     log.error(error);
     res.status(500).render('home', {
