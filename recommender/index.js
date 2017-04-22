@@ -7,11 +7,14 @@ const CrawlerAPI = require('./lib/crawler-api');
 const queue = require('./lib/queue');
 const config = require('./config');
 const express = require('express');
+const logger = require('morgan');
 
 const app = express();
 
 app.set('env', process.env.MODE || config.defaultMode);
+app.set('queue', queue);
 
+app.use(logger(config.logger.type));
 app.use(config.versionPrefix, require('./lib/api'));
 
 
@@ -44,10 +47,10 @@ sequelize.authenticate().then(function() {
 }).then(function(users) {
   let ids = users.map((user) => user.id);
 
-  ids.forEach(function(id) {
-    queue.create({
-      title: 'Processing ' + id,
-      id
-    });
-  });
+  // ids.forEach(function(id) {
+  //   queue.create({
+  //     title: 'Processing ' + id,
+  //     id
+  //   });
+  // });
 }).catch(log.error);

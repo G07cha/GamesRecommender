@@ -1,15 +1,17 @@
-const request = require('request-promise-native');
 const { resolve } = require('url');
+const request = require('request-promise-native').defaults({
+  json: true,
+  baseUrl: 'http://crawler/v1/'
+});
 
-const ENDPOINT = 'http://crawler/v1/';
 const PATHS = {
-  user: 'users/',
-  userList: 'users',
-  userListExcl: 'users/not/',
-  playtime: 'playtimes/',
-  playtimeList: 'playtimes',
-  app: 'apps/',
-  appList: 'apps',
+  user: '/users/',
+  userList: '/users',
+  userListExcl: '/users/not/',
+  playtime: '/playtimes/',
+  playtimeList: '/playtimes',
+  app: '/apps/',
+  appList: '/apps',
 }
 
 const CrawlerAPI = {
@@ -43,21 +45,20 @@ const CrawlerAPI = {
 };
 
 function resource(name, id) {
-  let params;
-  let url = resolve(ENDPOINT, PATHS[name]);
+  let qs;
+  let url = PATHS[name];
   if(id) {
     url = resolve(url, id);
   }
 
   this.setParams = function(parameters) {
-    params = parameters;
+    qs = parameters;
     return this;
   }
 
   this.send = function(additionalData = {}) {
-    const json = true;
     let data = {
-      url, params, json
+      url, qs
     };
 
     data = Object.assign(additionalData, data);

@@ -91,8 +91,8 @@ class Crawler {
     return this.queue.stop();
   }
 
-  addTask(task) {
-    this.queue.addTask(task);
+  addTask(task, priority) {
+    return this.queue.addTask(task, priority);
   }
 }
 

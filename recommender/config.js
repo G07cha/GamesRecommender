@@ -16,6 +16,9 @@ const config = {
       'logging': false
     }
   },
+  logger: {
+    type: 'tiny'
+  },
   log: {
     prefix: function () {
       return new Date().toISOString() + ' [DB-Manager]'

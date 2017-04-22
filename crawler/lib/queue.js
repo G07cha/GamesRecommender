@@ -32,12 +32,16 @@ class Queue {
     this.executor = executor;
   }
 
-  addTask(task) {
-    if(this.tasks.find((t) => t === task)) {
-      return;
+  addTask(task, priority = 'low') {
+    let existingTask = this.tasks.find((t) => t === task);
+    if(existingTask) {
+      return existingTask;
     }
 
-    this.q.create('crawl', task).save();
+    let newTask = this.q.create('crawl', task).priority(priority).save();
+    this.tasks.push(newTask);
+
+    return newTask;
   }
 
   start() {

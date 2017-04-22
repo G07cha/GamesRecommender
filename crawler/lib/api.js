@@ -9,11 +9,29 @@ epilogue.initialize({
   sequelize: sequelize
 });
 
-epilogue.resource({
+let userResource = epilogue.resource({
   model: User,
   endpoints: ['/users', '/users/:id'],
   actions: ['read', 'list'],
   associations: true
+});
+
+userResource.read.fetch.before(function(req, res, context) {
+  return User.findById(req.params.id).then(function(user) {
+    if(user) {
+      return;
+    }
+
+    return new Promise(function(resolve, reject) {
+      req.app
+      .get('crawler')
+      .addTask(req.params.id, 'high')
+      .on('complete', resolve)
+      .on('failed', reject);
+    });
+  }).then(function() {
+    return context.continue;
+  });
 });
 
 epilogue.resource({

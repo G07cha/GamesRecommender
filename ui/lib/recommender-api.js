@@ -1,10 +1,12 @@
-const request = require('request-promise-native');
 const { resolve } = require('url');
+const request = require('request-promise-native').defaults({
+  json: true,
+  baseUrl: 'http://recommender/v1/'
+});
 
-const ENDPOINT = 'http://recommender/v1/';
 const PATHS = {
-  recommendation: 'recommendations/',
-  recommendationList: 'recommendations'
+  recommendation: '/recommendations/',
+  recommendationList: '/recommendations'
 }
 
 const CrawlerAPI = {
@@ -17,20 +19,19 @@ const CrawlerAPI = {
 };
 
 function resource(name, id) {
-  let params;
-  let url = resolve(ENDPOINT, PATHS[name]);
+  let qs;
+  let url = PATHS[name];
   if(id) {
     url = resolve(url, id);
   }
 
-  this.setParams = function(parameters) {
-    params = parameters;
+  this.setParams = function(params) {
+    qs = params;
     return this;
   }
 
   this.send = function() {
-    const json = true;
-    return request.get({url, params, json});
+    return request.get({url, qs});
   }
 
   return this;

@@ -41,7 +41,7 @@ module.exports = {
     });
   },
 
-  create: function(data) {
-    queue.create(JOB_NAME, data).priority('low').save();
+  create: function(data, priority = 'low') {
+    return queue.create(JOB_NAME, data).priority(priority).save();
   }
 };

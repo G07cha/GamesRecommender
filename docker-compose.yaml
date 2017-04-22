@@ -11,6 +11,9 @@ services:
     links:
       - redis
       - crawler
+    depends_on:
+      - recommender-db
+      - redis
     environment:
       - DASHBOARD_PORT=3000
   recommender-db:

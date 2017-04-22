@@ -11,6 +11,7 @@ const log = require('console-log-level')(config.log);
 const crawler = new Crawler();
 const app = express();
 
+app.set('crawler', crawler);
 app.set('env', process.env.MODE || config.defaultMode);
 
 app.use(bodyParser.json(config.bodyParser.json));

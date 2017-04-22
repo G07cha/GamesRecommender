@@ -11,6 +11,7 @@ class UserGames {
 
   get(page = 0, count = 10) {
     return RecommenderAPI.getRecommendationList({
+      userId: this.id,
       offset: page * count,
       count
     }).then(function(recommendations) {

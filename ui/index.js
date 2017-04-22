@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express');
-const passport = require('passport');
 const compression = require('compression');
 const exphbs  = require('express-handlebars');
 const expressStatusMonitor = require('express-status-monitor');
@@ -29,8 +28,6 @@ app.use(compression());
 app.use(logger(config.logger.type));
 app.use(bodyParser.json(config.bodyParser.json));
 app.use(bodyParser.urlencoded(config.bodyParser.urlencoded));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(cookieParser());
 
 // Mount routes
