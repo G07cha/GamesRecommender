@@ -38,7 +38,10 @@ class Queue {
       return existingTask;
     }
 
-    let newTask = this.q.create('crawl', task).priority(priority).save();
+    let newTask = this.q.create('crawl', task)
+      .priority(priority)
+      .removeOnComplete(true)
+      .save();
     this.tasks.push(newTask);
 
     return newTask;

@@ -42,6 +42,9 @@ module.exports = {
   },
 
   create: function(data, priority = 'low') {
-    return queue.create(JOB_NAME, data).priority(priority).save();
+    return queue.create(JOB_NAME, data)
+      .removeOnComplete(true)
+      .priority(priority)
+      .save();
   }
 };
