@@ -1,4 +1,5 @@
 const kue = require('kue-unique');
+const config = require('../config');
 const log = require('console-log-level')({
   prefix: function() {
     return new Date().toISOString() + ' [Queue]'
@@ -13,10 +14,8 @@ class Queue {
   }) {
     this.settings = settings;
     this.settings.prefix = 'c';
-    this.settings.redis = {
-      port: process.env.REDIS_PORT_6379_TCP_PORT,
-      host: 'redis'
-    }
+    this.queueName = 'crawl';
+    this.settings.redis = config.redis;
     this.q = kue.createQueue(settings);
 
     // Create WebUI
@@ -32,10 +31,12 @@ class Queue {
   }
 
   addTask(task, priority = 'low') {
-    return this.q.create('crawl', task)
+    return this.q.create(this.queueName, task)
       .unique(task.id)
       .priority(priority)
-      .removeOnComplete(true)
+      .attempts(config.queue.attempts)
+      .backoff(config.queue.backoff)
+      .removeOnComplete(config.queue.removeOnComplete)
       .save();
   }
 
@@ -45,7 +46,7 @@ class Queue {
       return;
     }
 
-    this.q.process('crawl', this.executor);
+    this.q.process(this.queueName, this.executor);
     log.debug('Queue is started');
   }
 
@@ -53,7 +54,7 @@ class Queue {
     log.debug('Stopping');
 
     return new Promise(function(resolve, reject) {
-      this.q.shutdown(60000, function(err = '') {
+      this.q.shutdown(config.queue.shutdown, function(err = '') {
         log.debug('Stopped', err);
 
         if(err) {
