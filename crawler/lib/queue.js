@@ -1,4 +1,4 @@
-const kue = require('kue');
+const kue = require('kue-unique');
 const log = require('console-log-level')({
   prefix: function() {
     return new Date().toISOString() + ' [Queue]'
@@ -17,7 +17,6 @@ class Queue {
       port: process.env.REDIS_PORT_6379_TCP_PORT,
       host: 'redis'
     }
-    this.tasks = [];
     this.q = kue.createQueue(settings);
 
     // Create WebUI
@@ -33,18 +32,11 @@ class Queue {
   }
 
   addTask(task, priority = 'low') {
-    let existingTask = this.tasks.find((t) => t === task);
-    if(existingTask) {
-      return existingTask;
-    }
-
-    let newTask = this.q.create('crawl', task)
+    return this.q.create('crawl', task)
+      .unique(task.id)
       .priority(priority)
       .removeOnComplete(true)
       .save();
-    this.tasks.push(newTask);
-
-    return newTask;
   }
 
   start() {
