@@ -1,0 +1,26 @@
+.main-form {
+  text-align: center;
+  margin-top: 15%;
+}
+
+.main-form > .title {
+  font-size: 24px;
+}
+
+.main-form > .subtitle {
+  font-size: 14px;
+  color: grey;
+}
+
+.main-form .error {
+  color: red;
+  height: 18px;
+  margin: 10px;
+}
+
+.main-form #submitBtn {
+  display: block;
+  margin: 10px auto;
+  background: #6161b5;
+  color: white;
+}

@@ -1,8 +1,13 @@
 <form class="main-form" action="/games" method="post">
+  <div class="title">
+    Steam Recommender
+  </div>
+  <small class="subtitle">True recommendations based on steam community</small>
+  <hr>
   <p class="error">
     {{error}}
   </p>
   <label for="value" class="label">Enter your steam name:</label>
-  <input type="text" class="input" name="value" id="valueInput">
-  <button type="submit" class="button positive" id="submitBtn">Get recommendations</button>
+  <input type="text" class="input" name="value" id="valueInput" required>
+  <button type="submit" class="btn positive" id="submitBtn">Get recommendations</button>
 </form>
