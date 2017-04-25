@@ -6,9 +6,7 @@ let steamAPI = new SteamAPI();
 
 function steamIdResolver(req, res) {
   return new Promise(function(resolve, reject) {
-    if(req.cookies.steamId) {
-      resolve(req.cookies.steamId);
-    } else if(req.body.value) {
+    if(req.body.value) {
       steamAPI.getUserId(req.body.value).then(function(steamId) {
         if(!steamId) {
           reject(`Cannot find steam id for ${req.body.value}`);
@@ -17,6 +15,8 @@ function steamIdResolver(req, res) {
         res.cookie('steamId', steamId);
         resolve(steamId);
       });
+    } else if (req.cookies.steamId) {
+      resolve(req.cookies.steamId);
     } else {
       reject('Missing steam name')
     }
