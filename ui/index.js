@@ -9,11 +9,15 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 
 const log = require('./lib/logger');
+const hbsHelpers = require('./lib/handlebars-helpers');
 const config = require('./config');
 const routes = require('./routes');
 
 const app = express();
-const hbs = exphbs.create({defaultLayout: 'main'});
+const hbs = exphbs.create({
+  defaultLayout: 'main',
+  helpers: hbsHelpers
+});
 
 app.engine('handlebars', hbs.engine);
 
