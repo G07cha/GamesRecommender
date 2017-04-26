@@ -61,3 +61,12 @@
 .show-btn > .btn {
   float: right;
 }
+
+.pagination {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.pagination > a {
+  text-decoration: none;
+}
