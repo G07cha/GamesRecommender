@@ -20,13 +20,16 @@ const config = {
   db: {
     'development': {
       'use_env_variable': 'DB',
-      'dialect': 'postgres',
-      'logging': false
+      options: {
+        'dialect': 'postgres'
+      }
     },
     'production': {
       'use_env_variable': 'DB',
-      'dialect': 'postgres',
-      'logging': false
+      options: {
+        'dialect': 'postgres',
+        'logging': false
+      }
     }
   },
   log: {
