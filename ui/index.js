@@ -6,8 +6,7 @@ const exphbs  = require('express-handlebars');
 const expressStatusMonitor = require('express-status-monitor');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const compression = require('compression');
+const cookieParser = require('cookie-parser')
 
 const log = require('./lib/logger');
 const hbsHelpers = require('./lib/handlebars-helpers');
@@ -27,7 +26,6 @@ app.set('env', process.env.MODE || config.defaultMode);
 app.set('views', config.views.path);
 app.set('view engine', 'handlebars');
 
-app.use(compression());
 app.use(express.static('assets'));
 app.use(expressStatusMonitor());
 app.use(compression());
