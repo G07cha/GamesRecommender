@@ -5,6 +5,8 @@
 
 .main-form > .title {
   font-size: 24px;
+  margin: 0;
+  font-weight: 500;
 }
 
 .main-form > .subtitle {
