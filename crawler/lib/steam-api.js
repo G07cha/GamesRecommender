@@ -52,8 +52,12 @@ class SteamAPI {
       relationship: relationship
     }).then(function(resp) {
       return resp.data.friendslist.friends.map((f) => f.steamid);
-    }).catch(function() {
-      return [];
+    }).catch(function(errResp) {
+      if(errResp.statusCode < 500) {
+        return [];
+      } else {
+        throw errResp;
+      }
     });
   }
 
