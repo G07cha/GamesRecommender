@@ -9,6 +9,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     name: DataTypes.STRING,
+    description: DataTypes.STRING,
+    price: DataTypes.INTEGER,
+    mac: DataTypes.BOOLEAN,
+    linux: DataTypes.BOOLEAN,
+    windows: DataTypes.BOOLEAN,
     logoUrl: DataTypes.STRING
   }, {
     timestamps: false,

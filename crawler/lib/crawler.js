@@ -57,6 +57,11 @@ class Crawler {
             return App.create({
               id: app.appId,
               name: app.name,
+              description: app.description,
+              mac: app.platforms.mac,
+              windows: app.platforms.windows,
+              linux: app.platforms.linux,
+              price: app.price.initial,
               logoUrl: app.logo
             });
           }
