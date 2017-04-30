@@ -121,10 +121,10 @@ class Crawler {
         done();
         log.info('Done processing', id);
       }).catch(function(error) {
-        log.error('Error:', error);
         if(isNewUser) {
           done();
         } else {
+          log.error(error);
           done(error);
         }
       });
