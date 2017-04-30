@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   recommender:
@@ -17,7 +17,7 @@ services:
     environment:
       - DASHBOARD_PORT=3000
   recommender-db:
-    image: postgres
+    image: zsoltm/postgresql-armhf
     restart: always
   crawler:
     build: ./crawler
@@ -31,7 +31,7 @@ services:
       - crawler-db
       - redis
   crawler-db:
-    image: postgres
+    image: zsoltm/postgresql-armhf
     restart: always
   ui:
     build: ./ui
@@ -41,10 +41,10 @@ services:
     environment:
       - PORT=8000
     ports:
-      - "8000:8000"
+      - "80:8000"
     links:
       - crawler
       - recommender
   redis:
-    image: redis
+    image: zsoltm/redis-armhf
     restart: always

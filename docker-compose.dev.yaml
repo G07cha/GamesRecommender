@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  recommender:
+    build:
+      dockerfile: Dockerfile.dev
+  recommender-db:
+    image: postgres
+  crawler:
+    build:
+      dockerfile: Dockerfile.dev
+  crawler-db:
+    image: postgres
+  ui:
+    build:
+      dockerfile: Dockerfile.dev
+    ports:
+      - "80:8000"
+  redis:
+    image: redis

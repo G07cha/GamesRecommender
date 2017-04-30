@@ -1,4 +1,4 @@
-FROM armhf/node:6.10
+FROM node:boron
 
 # Create app directory
 RUN mkdir -p /usr/src/app
