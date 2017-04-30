@@ -9,8 +9,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     name: DataTypes.STRING,
-    description: DataTypes.STRING,
-    price: DataTypes.INTEGER,
+    description: DataTypes.TEXT,
+    price: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     mac: DataTypes.BOOLEAN,
     linux: DataTypes.BOOLEAN,
     windows: DataTypes.BOOLEAN,
@@ -22,6 +25,10 @@ module.exports = function(sequelize, DataTypes) {
         App.hasMany(models.Playtime, {
           foreignKey: 'appId',
           onDelete: 'cascade'
+        });
+
+        App.belongsToMany(models.Genre, {
+          through: 'AppGenre'
         });
       }
     }

@@ -1,7 +1,7 @@
 'use strict';
 
 const router = require('express').Router();
-const { sequelize, App, Playtime, User } = require('../models');
+const { sequelize, App, Playtime, User, Genre } = require('../models');
 const epilogue = require('epilogue');
 
 epilogue.initialize({
@@ -43,6 +43,13 @@ epilogue.resource({
 epilogue.resource({
   model: App,
   endpoints: ['/apps', '/apps/:id'],
+  actions: ['read', 'list'],
+  include: [ Genre ]
+});
+
+epilogue.resource({
+  model: Genre,
+  endpoints: ['/genres', '/genres/:id'],
   actions: ['read', 'list']
 });
 

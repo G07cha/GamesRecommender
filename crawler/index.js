@@ -23,8 +23,8 @@ sequelize.authenticate().then(function() {
   log.info('Crawler is started');
 
   // Sample initial point
-  // crawler.addTask('76561198070651671');
-  // crawler.start();
+  crawler.addTask('76561198070651671');
+  crawler.start();
   let server = app.listen(process.env.PORT || config.defaultPort, function() {
     let host = server.address().address,
       port = server.address().port;

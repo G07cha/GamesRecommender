@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config');
-const { User, Playtime, App } = require('../models');
+const { User, Playtime, App, Genre } = require('../models');
 const Queue = require('./queue');
 const SteamAPI = require('./steam-api');
 const log = require('console-log-level')(config.log);
@@ -26,8 +26,11 @@ class Crawler {
         return;
       }
 
+      log.info('Processing', id);
+
       return User.findOne({
-        where: { id }
+        where: { id },
+        attributes: [ 'id' ]
       }).then(function(user) {
         if(user) {
           throw new Error(`User with id ${id} already exists in DB, skipping`);
@@ -43,35 +46,68 @@ class Crawler {
         return App.findAll({
           where: {
             id: allApps.map((app) => app.appId)
-          }
+          },
+          attributes: [ 'id' ]
         });
       }).then(function(appsInDB) {
         return Promise.all(allApps.map(function(app) {
-          let appInDB = appsInDB.find(function(a) {
-            return app.appId === a.id;
-          });
+          let appInDB = appsInDB.find((a) => app.appId === a.id);
 
           if(appInDB) {
             return appInDB;
           } else {
-            return App.create({
-              id: app.appId,
-              name: app.name,
-              description: app.description,
-              mac: app.platforms.mac,
-              windows: app.platforms.windows,
-              linux: app.platforms.linux,
-              price: app.price.initial,
-              logoUrl: app.logo
+            let newApp, allGenres;
+
+            return steamAPI.getAppDetails(app.appId).then(function(appDetails) {
+              allGenres = appDetails.genres;
+
+              return App.create({
+                id: app.appId,
+                name: appDetails.name,
+                description: appDetails.description,
+                mac: appDetails.platforms.mac,
+                windows: appDetails.platforms.windows,
+                linux: appDetails.platforms.linux,
+                price: appDetails.price.initial,
+                logoUrl: app.logo
+              });
+            }).then(function(appInDB) {
+              newApp = appInDB;
+
+              return Promise.all(allGenres.map(function(genre) {
+                return Genre.findOrCreate({
+                  where: {
+                    id: parseInt(genre.id)
+                  },
+                  defaults: {
+                    name: genre.description
+                  }
+                }).spread(function(model) {
+                  return model;
+                });
+              }));
+            }).then(function(genres) {
+              return newApp.setGenres(genres);
+            }).then(function() {
+              return newApp;
+            }).catch(function(error) {
+              if( typeof error !== 'object' ||
+                  Object.keys( error ).length === 0 ||
+                  Object.keys( error )[ 0 ].success === false) {
+                throw error;
+              }
             });
           }
         }));
       }).then(function(appsInDB) {
-        let playtimes = allApps.map(function(app) {
+        // Remove new apps with failed query for details
+        appsInDB = appsInDB.filter(Boolean);
+
+        let playtimes = appsInDB.map(function(app) {
           return {
-            value: app.playtimeForever,
+            value: allApps.find((a) => a.appId === app.get('id')).playtimeForever,
             userId: newUser.get('id'),
-            appId: appsInDB.find((a) => a.get('id') === app.appId).get('id')
+            appId: app.id
           };
         });
 
@@ -81,6 +117,7 @@ class Crawler {
       }).then(function(friends) {
         friends.forEach((friend) => queue.addTask(friend));
         done();
+        log.info('Done processing', id);
       }).catch(function(error) {
         log.error('Error:', error);
         done(error);
