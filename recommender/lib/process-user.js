@@ -52,7 +52,9 @@ module.exports = wrap(function* (userId) {
 
   let existingRecords = yield Recommendation.findAll({
     where: {
-      appId: recommendations.map((r) => r.appId),
+      appId: {
+        $in: recommendations.map((r) => r.appId)
+      },
       userId: userId
     }
   });
