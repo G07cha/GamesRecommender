@@ -47,10 +47,10 @@ sequelize.authenticate().then(function() {
 }).then(function(users) {
   let ids = users.map((user) => user.id);
 
-  // ids.forEach(function(id) {
-  //   queue.create({
-  //     title: 'Processing ' + id,
-  //     id
-  //   });
-  // });
+  ids.forEach(function(id) {
+    queue.create({
+      title: 'Processing ' + id,
+      id
+    });
+  });
 }).catch(log.error);
