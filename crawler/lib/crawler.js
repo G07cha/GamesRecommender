@@ -19,7 +19,7 @@ class Crawler {
     this.queue = queue;
 
     this.queue.setExecutor(function(job, done) {
-      let newUser, allApps,
+      let newUser, allApps, isNewUser,
         id = job.data;
 
       if(!id) {
@@ -33,7 +33,9 @@ class Crawler {
         attributes: [ 'id' ]
       }).then(function(user) {
         if(user) {
-          throw new Error(`User with id ${id} already exists in DB, skipping`);
+          log.info(`User with id ${id} already exists in DB, skipping`);
+          isNewUser = true;
+          throw new Error('Already exists');
         }
 
         return User.create({ id });
@@ -120,7 +122,11 @@ class Crawler {
         log.info('Done processing', id);
       }).catch(function(error) {
         log.error('Error:', error);
-        done(error);
+        if(isNewUser) {
+          done();
+        } else {
+          done(error);
+        }
       });
     });
   }
