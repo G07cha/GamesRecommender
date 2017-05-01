@@ -19,17 +19,20 @@
 }
 
 .game-list > .game {
+  display: flex;
+  flex-direction: column;
   position: relative;
 	margin-bottom: 20px;
 	background: #fefff9;
 	color: #363636;
-  box-shadow: #b9b9b9 0 0 8px 0;
+  border: 1px solid #ececec;
+  box-shadow: none;
 	text-decoration: none;
   cursor: pointer;
   border-radius: 5px;
   margin: 10px;
-  max-width: 250px;
-  transition: box-shadow 1s;
+  max-width: 270px;
+  transition: box-shadow 0.5s;
 }
 
 .game-list > .game:hover {
@@ -49,13 +52,38 @@
 }
 
 .game .logo {
+  flex: 1 1 auto;
   height: auto;
-  width: 250px;
+  width: 270px;
+  display: block;
 }
 
-.game > .show-btn {
+.game .genre-list {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.game .genre {
+  background-color: #6161b5;
+  color: white;
+  border-radius: 10px;
+  margin: 2px 5px;
+  padding: 5px;
+}
+
+.game > .game-footer {
+  flex: 0 0 30px;
+  margin: 5px;
+}
+
+.game .price {
+  vertical-align: middle;
+}
+
+.game .show-btn {
   margin: 10px 0;
-  display: block;
 }
 
 .show-btn > .btn {

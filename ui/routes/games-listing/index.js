@@ -14,7 +14,10 @@ function gameListingHandler(req, res) {
 
   getSteamId(req, res).then(function(steamId) {
     let gameList = new UserGames(steamId);
-    return gameList.get(page);
+
+    return gameList.get(page, 20, {
+      genre: req.query.genre
+    });
   }).then(function(games) {
     res.render('games-listing', { nextPage, prevPage, games });
   }).catch(function(error) {

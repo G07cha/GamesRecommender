@@ -3,10 +3,20 @@
   <a href="http://store.steampowered.com/app/{{id}}" target="_blank">
     <div class="game">
       <h3 class="name">{{name}}</h3>
+      <div class="genre-list">
+        {{#each Genres}}
+          <a class="genre" href="{{domain}}/games?genre={{id}}">
+            {{name}}
+          </a>
+        {{/each}}
+      </div>
       <img class="logo" src="{{logoUrl}}"/>
-      <a href="http://store.steampowered.com/app/{{id}}" class="show-btn" target="_blank">
-        <button class="btn primary">Show</button>
-      </a>
+      <div class="game-footer">
+        <span class="price">{{formatPrice price}}</span>
+        <a href="http://store.steampowered.com/app/{{id}}" class="show-btn" target="_blank">
+          <button class="btn primary">Show</button>
+        </a>
+      </div>
     </div>
   </a>
   {{else}}

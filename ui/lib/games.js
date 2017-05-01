@@ -9,15 +9,14 @@ class UserGames {
     this.id = id;
   }
 
-  get(page = 1, count = 10) {
+  get(page = 1, count = 10, params = {}) {
     return RecommenderAPI.getRecommendationList({
-      userId: this.id,
-      offset: (page - 1) * count,
-      count
+      userId: this.id
     }).then(function(recommendations) {
-      return Promise.all(recommendations.map(function(r) {
-        return CrawlerAPI.getApp(r.appId);
-      }));
+      params.ids = recommendations.map((r) => r.appId).join(',');
+      params.offset = (page - 1) * count;
+      params.count = count;
+      return CrawlerAPI.appList(params);
     });
   }
 }
