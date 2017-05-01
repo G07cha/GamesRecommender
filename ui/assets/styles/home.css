@@ -26,3 +26,10 @@
   background: #6161b5;
   color: white;
 }
+
+.stats {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 5px;
+  color: grey;
+}

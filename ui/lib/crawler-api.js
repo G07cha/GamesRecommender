@@ -7,6 +7,7 @@ const request = require('request-promise-native').defaults({
 const PATHS = {
   user: '/users/',
   userList: '/users',
+  totalUsers: '/total-users',
   playtime: '/playtimes/',
   playtimeList: '/playtimes',
   app: '/apps/',
@@ -19,6 +20,9 @@ const CrawlerAPI = {
   },
   getUserList: function(params = {}) {
     return resource('userList').setParams(params).send();
+  },
+  getTotalUsers: function() {
+    return resource('totalUsers').setParams().send();
   },
   getPlaytimeList: function(params = {}) {
     return resource('playtimeList').setParams(params).send();

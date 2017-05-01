@@ -39,7 +39,7 @@ sequelize.authenticate().then(function() {
 
   return queue.getPending();
 }).then(function(currentQueue) {
-  if(currentQueue) {
+  if(currentQueue.length) {
     return [];
   }
 

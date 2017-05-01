@@ -109,4 +109,12 @@ router.get('/users/not/:id', function(req, res) {
   });
 });
 
+router.get('/total-users', function(req, res) {
+  return User.count().then(function(result) {
+    res.send(result.toString());
+  }).catch(function(err) {
+    res.status(500).send(err);
+  });
+});
+
 module.exports = router;

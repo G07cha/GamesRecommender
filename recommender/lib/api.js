@@ -4,6 +4,7 @@ const router = require('express').Router();
 const { sequelize, Recommendation } = require('../models');
 const epilogue = require('epilogue');
 const CrawlerAPI = require('./crawler-api');
+const log = require('./logger');
 
 epilogue.initialize({
   app: router,
@@ -37,6 +38,15 @@ recommendationResource.list.fetch.after(function(req, res, context) {
       });
     });
   }
+});
+
+router.get('/total-recommendations', function(req, res) {
+  Recommendation.count().then(function(total) {
+    res.send(total.toString());
+  }).catch(function(err) {
+    res.status(500).send(err);
+    log.error(err);
+  });
 });
 
 module.exports = router;
