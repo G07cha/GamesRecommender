@@ -40,11 +40,51 @@ epilogue.resource({
   actions: ['read', 'list']
 });
 
-epilogue.resource({
+let appResource = epilogue.resource({
   model: App,
   endpoints: ['/apps', '/apps/:id'],
-  actions: ['read', 'list'],
-  include: [ Genre ]
+  actions: ['read', 'list']
+});
+
+appResource.list.fetch(function(req, res, context) {
+  req.query = req.query || {};
+  context.count = req.query.count;
+  context.offset = req.query.offset || 0;
+  if(req.query.ids) {
+    context.criteria.id = {
+      $in: req.query.ids.split(',')
+    }
+    context.count = null;
+    context.offset = null;
+  }
+  return App.findAll({
+    where: context.criteria,
+    limit: context.count,
+    offset: context.offset,
+    attributes: req.query.genre ? [ 'id' ] : null,
+    include: [{
+      model: Genre,
+      where: req.query.genre ? { id: req.query.genre } : null
+    }]
+  }).then(function(apps) {
+    if(req.query.genre) {
+      return App.findAll({
+        where: {
+          id: {
+            $in: apps.map((app) => app.get('id'))
+          }
+        },
+        limit: req.query.count,
+        offset: req.query.offset,
+        include: [ Genre ]
+      });
+    } else {
+      return apps;
+    }
+  }).then(function(apps) {
+    context.instance = apps;
+    return context.continue;
+  });
 });
 
 epilogue.resource({
