@@ -21,7 +21,7 @@ let recommendationResource = epilogue.resource({
 });
 
 recommendationResource.list.fetch.after(function(req, res, context) {
-  if(context.instance.length) {
+  if(context.instance.length || !context.criteria.userId) {
     return context.continue;
   } else {
     return CrawlerAPI.getUser(context.criteria.userId).then(function(user) {
@@ -29,7 +29,7 @@ recommendationResource.list.fetch.after(function(req, res, context) {
         req.app.get('queue').create({
           title: 'Processing ' + user.id,
           id: user.id
-        }).on('complete', resolve).on('failed', reject);
+        }, 'high').on('complete', resolve).on('failed', reject);
       });
     }).then(function() {
       return Recommendation.findAll(context.options).then(function(recommends) {
