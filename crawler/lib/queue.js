@@ -9,7 +9,6 @@ const log = require('console-log-level')({
 
 class Queue {
   constructor(settings = {
-    delay: 0,
     unique: false
   }) {
     this.settings = settings;

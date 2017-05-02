@@ -10,13 +10,13 @@ const steamAPI = new SteamAPI();
 const MINIMAL_PLAYTIME = 60; // 2 hours
 
 class Crawler {
-  constructor() {
-    let queue = new Queue({
-      delay: 4000,
+  constructor(queue) {
+    this.queue = queue || new Queue({
       unique: true
     });
 
-    this.queue = queue;
+    // Expose for executor
+    queue = this.queue;
 
     this.queue.setExecutor(function(job, done) {
       let newUser, allApps, isNewUser,

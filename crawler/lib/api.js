@@ -24,7 +24,7 @@ userResource.read.fetch.before(function(req, res, context) {
 
     return new Promise(function(resolve, reject) {
       req.app
-      .get('crawler')
+      .get('queue')
       .addTask(req.params.id, 'high')
       .on('complete', resolve)
       .on('failed', reject);
@@ -40,13 +40,17 @@ epilogue.resource({
   actions: ['read', 'list']
 });
 
-let appResource = epilogue.resource({
+epilogue.resource({
   model: App,
   endpoints: ['/apps', '/apps/:id'],
-  actions: ['read', 'list']
+  actions: ['read']
 });
 
-appResource.list.fetch(function(req, res, context) {
+router.get('/apps', function(req, res) {
+  let context = {
+    criteria: {}
+  };
+
   req.query = req.query || {};
   context.count = req.query.count;
   context.offset = req.query.offset || 0;
@@ -84,8 +88,8 @@ appResource.list.fetch(function(req, res, context) {
       return apps;
     }
   }).then(function(apps) {
-    context.instance = apps;
-    return context.continue;
+    res.send(apps);
+    return context.stop;
   });
 });
 
