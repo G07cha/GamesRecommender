@@ -7,6 +7,7 @@ const request = require('request-promise-native').defaults({
 const PATHS = {
   user: '/users/',
   userList: '/users',
+  totalUsers: '/total-users',
   userListExcl: '/users/not/',
   playtime: '/playtimes/',
   playtimeList: '/playtimes',
@@ -32,6 +33,9 @@ const CrawlerAPI = {
 
       return parseInt(contentRange.substr(contentRange.lastIndexOf('/') + 1));
     });
+  },
+  getTotalUsers: function() {
+    return resource('totalUsers').setParams().send();
   },
   getUserListWithExclude(id, params = {}) {
     return resource('userListExcl', id).setParams(params).send();

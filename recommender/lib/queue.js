@@ -26,7 +26,7 @@ process.once('SIGTERM', function () {
   });
 });
 
-module.exports = {
+const props = {
   process: function(handler) {
     queue.process(JOB_NAME, handler);
   },
@@ -41,6 +41,19 @@ module.exports = {
     });
   },
 
+  onEmpty: function(handler) {
+    let checkForEmptyQueue = function() {
+      props.getPending().then(function(count) {
+        if(count < 1) {
+          handler();
+        }
+      })
+    };
+
+    queue.on('job failed', checkForEmptyQueue);
+    queue.on('job complete', checkForEmptyQueue);
+  },
+
   create: function(data, priority = 'low') {
     return queue.create(JOB_NAME, data)
       .removeOnComplete(true)
@@ -48,3 +61,5 @@ module.exports = {
       .save();
   }
 };
+
+module.exports = props;

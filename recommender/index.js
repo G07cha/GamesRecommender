@@ -11,12 +11,39 @@ const logger = require('morgan');
 
 const app = express();
 
-app.set('env', process.env.MODE || config.defaultMode);
+app.set('env', process.env.NODE_ENV || config.defaultMode);
 app.set('queue', queue);
 
 app.use(logger(config.logger.type));
 app.use(config.versionPrefix, require('./lib/api'));
 
+let totalUsers = 0;
+let addUsers = function() {
+  return CrawlerAPI.getTotalUsers().then(function(total) {
+    total = parseInt(total);
+    if(total > totalUsers) {
+      totalUsers = total;
+      return CrawlerAPI.getUserList();
+    } else {
+      return [];
+    }
+  }).then(function(users) {
+    let ids = users.map((user) => user.id);
+
+    ids.forEach(function(id) {
+      queue.create({
+        title: 'Processing ' + id,
+        id
+      });
+    });
+
+    if(users.length === 0) {
+      setTimeout(function() {
+        addUsers();
+      }, 1000 * 60);
+    }
+  });
+}
 
 queue.process(function(job, done) {
   processUser(job.data.id).then(function() {
@@ -25,6 +52,10 @@ queue.process(function(job, done) {
     log.error(err);
     done(err)
   });
+});
+
+queue.onEmpty(function() {
+  addUsers();
 });
 
 sequelize.authenticate().then(function() {
@@ -37,20 +68,5 @@ sequelize.authenticate().then(function() {
     log.info('API running at:', host, port);
   });
 
-  return queue.getPending();
-}).then(function(currentQueue) {
-  if(currentQueue.length) {
-    return [];
-  }
-
-  return CrawlerAPI.getUserList();
-}).then(function(users) {
-  let ids = users.map((user) => user.id);
-
-  ids.forEach(function(id) {
-    queue.create({
-      title: 'Processing ' + id,
-      id
-    });
-  });
+  return addUsers();
 }).catch(log.error);
