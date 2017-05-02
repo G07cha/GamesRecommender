@@ -3,6 +3,7 @@
 const config = require('./config');
 
 const express = require('express');
+const logger = require('morgan');
 const bodyParser = require('body-parser');
 const Crawler = require('./lib/crawler');
 const { sequelize } = require('./models');
@@ -14,6 +15,7 @@ const app = express();
 app.set('crawler', crawler);
 app.set('env', process.env.NODE_ENV || config.defaultMode);
 
+app.use(logger(config.logger.type));
 app.use(bodyParser.json(config.bodyParser.json));
 app.use(config.versionPrefix, require('./lib/api'));
 

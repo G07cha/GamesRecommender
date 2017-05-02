@@ -32,6 +32,9 @@ const config = {
       }
     }
   },
+  logger: {
+    type: 'tiny'
+  },
   log: {
     prefix: function () {
       return new Date().toISOString() + ' [Crawler]'
