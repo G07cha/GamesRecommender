@@ -117,7 +117,21 @@ class Crawler {
       }).then(function() {
         return steamAPI.getFriends(newUser.get('id'));
       }).then(function(friends) {
-        friends.forEach((friend) => queue.addTask(friend));
+        return User.findAll({
+          where: {
+            id: {
+              $in: friends
+            }
+          }
+        }).then(function(existingFriends) {
+          friends.forEach(function(friendId) {
+            let isExists = existingFriends.find((f) => f.get('id') === friendId);
+            if(!isExists) {
+              queue.addTask(friendId);
+            }
+          });
+        });
+      }).then(function() {
         done();
         log.info('Done processing', id);
       }).catch(function(error) {

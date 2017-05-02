@@ -10,7 +10,7 @@ const config = {
       delay: 60 * 60 * 1000, // Hour in ms
       type:'exponential'
     },
-    removeOnComplete: false,
+    removeOnComplete: true,
     shutdownTimeout: 60 * 1000 // Minute in ms
   },
   redis: {
