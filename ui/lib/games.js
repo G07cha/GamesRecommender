@@ -10,13 +10,32 @@ class UserGames {
   }
 
   get(page = 1, count = 10, params = {}) {
+    let appIds;
+
     return RecommenderAPI.getRecommendationList({
       userId: this.id
-    }).then(function(recommendations) {
-      params.ids = recommendations.map((r) => r.appId).join(',');
+    }).then((recommendations) => {
+      if(recommendations.length === 0) {
+        return [];
+      }
+      appIds = recommendations.map((r) => parseInt(r.appId));
+      params.ids = appIds.join(',');
       params.offset = (page - 1) * count;
       params.count = count;
+
       return CrawlerAPI.appList(params);
+    }).then(function(apps) {
+      let sortedApps = [];
+
+      appIds.forEach(function(id) {
+        let app = apps.find((a) => a.id === id);
+
+        if(app) {
+          sortedApps.push(app);
+        }
+      });
+
+      return sortedApps;
     });
   }
 }
