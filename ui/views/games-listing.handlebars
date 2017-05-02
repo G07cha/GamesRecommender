@@ -1,6 +1,5 @@
 <div class="game-list">
   {{#each games}}
-  <a href="http://store.steampowered.com/app/{{id}}" target="_blank">
     <div class="game">
       <h3 class="name">{{name}}</h3>
       <div class="genre-list">
@@ -18,7 +17,6 @@
         </a>
       </div>
     </div>
-  </a>
   {{else}}
     <div class="no-recommendations">
       We currently don't have recommendations for you, please come back later!
