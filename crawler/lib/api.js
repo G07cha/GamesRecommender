@@ -54,8 +54,10 @@ appResource.list.fetch(function(req, res, context) {
     context.criteria.id = {
       $in: req.query.ids.split(',')
     }
-    context.count = null;
-    context.offset = null;
+    if(req.query.genre) {
+      context.count = null;
+      context.offset = null;
+    }
   }
   return App.findAll({
     where: context.criteria,
