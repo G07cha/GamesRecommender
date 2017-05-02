@@ -28,7 +28,11 @@ const config = {
       'use_env_variable': 'DB',
       options: {
         'dialect': 'postgres',
-        'logging': false
+        'logging': false,
+        pool: {
+          min: 0,
+          max: 8
+        }
       }
     }
   },
