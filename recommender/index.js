@@ -23,26 +23,33 @@ let addUsers = function() {
     total = parseInt(total);
     if(total > totalUsers) {
       totalUsers = total;
-      return CrawlerAPI.getUserList();
+
+      let userQueries = [];
+      const step = 100;
+
+      for(let i = 0; i < totalUsers; i += step) {
+        userQueries.push(CrawlerAPI.getUserList({
+          offset: i,
+          count: step
+        }).then(function(users) {
+          let ids = users.map((user) => user.id);
+
+          ids.forEach(function(id) {
+            queue.create({
+              title: 'Processing ' + id,
+              id
+            });
+          });
+        }));
+      }
+
+      return Promise.all(userQueries);
     } else {
-      return [];
-    }
-  }).then(function(users) {
-    let ids = users.map((user) => user.id);
-
-    ids.forEach(function(id) {
-      queue.create({
-        title: 'Processing ' + id,
-        id
-      });
-    });
-
-    if(users.length === 0) {
       setTimeout(function() {
         addUsers();
       }, 1000 * 60);
     }
-  });
+  }).catch(log.error);
 }
 
 queue.process(function(job, done) {
