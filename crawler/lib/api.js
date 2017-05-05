@@ -123,4 +123,8 @@ router.get('/total-users', function(req, res) {
   });
 });
 
+router.get('/ping', function(req, res) {
+  res.status(200).send('pong');
+});
+
 module.exports = router;
