@@ -52,15 +52,6 @@ let addUsers = function() {
   }).catch(log.error);
 }
 
-queue.process(function(job, done) {
-  processUser(job.data.id).then(function() {
-    done();
-  }).catch(function(err) {
-    log.error(err);
-    done(err)
-  });
-});
-
 queue.onEmpty(function() {
   addUsers();
 });
@@ -73,6 +64,17 @@ sequelize.authenticate().then(function() {
       port = server.address().port;
 
     log.info('API running at:', host, port);
+  });
+
+  return CrawlerAPI.waitForBoot();
+}).then(function() {
+  queue.process(function(job, done) {
+    processUser(job.data.id).then(function() {
+      done();
+    }).catch(function(err) {
+      log.error(err);
+      done(err)
+    });
   });
 
   return addUsers();

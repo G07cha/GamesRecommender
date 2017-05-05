@@ -13,6 +13,7 @@ const PATHS = {
   playtimeList: '/playtimes',
   app: '/apps/',
   appList: '/apps',
+  ping: '/ping'
 }
 
 const CrawlerAPI = {
@@ -46,6 +47,29 @@ const CrawlerAPI = {
   appList: function(params = {}) {
     return resource('appList').setParams(params).send();
   },
+  ping: function() {
+    return resource('ping').send();
+  },
+  waitForBoot: function(timeout = null, interval = 100) {
+    let startTime = Date.now();
+
+    return CrawlerAPI.ping().catch(function() {
+      if(timeout !== null) {
+        let endTime = Date.now();
+        timeout -= endTime - startTime;
+      }
+
+      if(timeout > 0 || timeout === null) {
+        return new Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(CrawlerAPI.waitForBoot(timeout, interval));
+          }, interval);
+        });
+      } else {
+        throw new Error('Crawler API doesn\'t came online after ' + timeout + 'ms');
+      }
+    });
+  }
 };
 
 function resource(name, id) {
