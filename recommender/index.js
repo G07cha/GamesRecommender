@@ -17,43 +17,13 @@ app.set('queue', queue);
 app.use(logger(config.logger.type));
 app.use(config.versionPrefix, require('./lib/api'));
 
-let totalUsers = 0;
-let addUsers = function() {
-  return CrawlerAPI.getTotalUsers().then(function(total) {
-    total = parseInt(total);
-    if(total > totalUsers) {
-      totalUsers = total;
-
-      let userQueries = [];
-      const step = 100;
-
-      for(let i = 0; i < totalUsers; i += step) {
-        userQueries.push(CrawlerAPI.getUserList({
-          offset: i,
-          count: step
-        }).then(function(users) {
-          let ids = users.map((user) => user.id);
-
-          ids.forEach(function(id) {
-            queue.create({
-              title: 'Processing ' + id,
-              id
-            });
-          });
-        }));
-      }
-
-      return Promise.all(userQueries);
-    } else {
-      setTimeout(function() {
-        addUsers();
-      }, 1000 * 60);
-    }
-  }).catch(log.error);
-}
-
-queue.onEmpty(function() {
-  addUsers();
+queue.process(function(job, done) {
+  processUser(job.data.id).then(function() {
+    done();
+  }).catch(function(err) {
+    log.error(err);
+    done(err)
+  });
 });
 
 sequelize.authenticate().then(function() {
@@ -67,15 +37,4 @@ sequelize.authenticate().then(function() {
   });
 
   return CrawlerAPI.waitForBoot();
-}).then(function() {
-  queue.process(function(job, done) {
-    processUser(job.data.id).then(function() {
-      done();
-    }).catch(function(err) {
-      log.error(err);
-      done(err)
-    });
-  });
-
-  return addUsers();
 }).catch(log.error);
