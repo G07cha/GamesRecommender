@@ -40,9 +40,17 @@ recommendationResource.list.fetch.after(function(req, res, context) {
   }
 });
 
-router.get('/total-recommendations', function(req, res) {
-  Recommendation.count().then(function(total) {
-    res.send(total.toString());
+router.get('/stats', function(req, res) {
+  Promise.all([
+    Recommendation.count(),
+    Recommendation.aggregate('userId', 'count', {
+      distinct: true
+    })
+  ]).then(function(stats) {
+    res.send({
+      recommendations: stats[0],
+      users: stats[1]
+    });
   }).catch(function(err) {
     res.status(500).send(err);
     log.error(err);

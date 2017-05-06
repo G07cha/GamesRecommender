@@ -7,7 +7,7 @@ const request = require('request-promise-native').defaults({
 const PATHS = {
   recommendation: '/recommendations/',
   recommendationList: '/recommendations',
-  totalRecommendations: '/total-recommendations'
+  stats: '/stats'
 }
 
 const CrawlerAPI = {
@@ -17,8 +17,8 @@ const CrawlerAPI = {
   getRecommendationList: function(params = {}) {
     return resource('recommendationList').setParams(params).send();
   },
-  getTotalRecommendations: function() {
-    return resource('totalRecommendations').send();
+  getStats: function() {
+    return resource('stats').send();
   }
 };
 
