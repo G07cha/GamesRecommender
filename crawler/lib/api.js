@@ -22,13 +22,9 @@ userResource.read.fetch.before(function(req, res, context) {
       return;
     }
 
-    return new Promise(function(resolve, reject) {
-      req.app
+    return req.app
       .get('queue')
-      .addTask(req.params.id, 'high')
-      .on('complete', resolve)
-      .on('failed', reject);
-    });
+      .process(req.params.id);
   }).then(function() {
     return context.continue;
   });
@@ -111,6 +107,44 @@ router.get('/users/not/:id', function(req, res) {
     limit: req.params.limit,
     offset: req.params.offset
   }).then(res.send.bind(res)).catch(function (err) {
+    res.status(500).send(err);
+  });
+});
+
+router.get('/users/similar/:id', function(req, res) {
+  const countFieldName = '"PlaytimesCount"';
+
+  return User.findOne({
+    where: {
+      id: req.params.id,
+    },
+    attributes: ['id'],
+    include: [{
+      model: Playtime,
+      attributes: ['appId']
+    }]
+  }).then(function(user) {
+    if(!user) {
+      throw new Error(`User with id '${req.params.id}' is not found`);
+    }
+
+    let appIds = user.Playtimes.map((p) => p.get('appId')).join(',');
+
+    return User.findAll({
+      offset: req.query.offset,
+      limit: req.query.count,
+      include: [Playtime],
+      attributes: [
+        [sequelize.literal(
+          `(SELECT COUNT(*) FROM "${Playtime.tableName}" WHERE "${Playtime.tableName}"."userId" = "User".id
+            AND "${Playtime.tableName}"."appId" IN (${appIds}))`),
+          countFieldName]
+      ],
+      order: [[sequelize.literal(countFieldName), 'DESC']]
+    });
+  }).then(function(users) {
+    res.send(users);
+  }).catch(function (err) {
     res.status(500).send(err);
   });
 });

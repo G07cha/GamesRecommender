@@ -15,10 +15,7 @@ class Crawler {
       unique: true
     });
 
-    // Expose for executor
-    queue = this.queue;
-
-    this.queue.setExecutor(function(job, done) {
+    this.executor = function(job, done) {
       let newUser, allApps, isNewUser,
         id = job.data;
 
@@ -142,7 +139,12 @@ class Crawler {
           done(error);
         }
       });
-    });
+    };
+
+    // Expose for executor
+    queue = this.queue;
+
+    this.queue.setExecutor(this.executor);
   }
 
   start() {
@@ -151,6 +153,15 @@ class Crawler {
 
   stop() {
     return this.queue.stop();
+  }
+
+  process(task) {
+    return new Promise(function(resolve, reject) {
+      return this.executor(task, function(error) {
+        if(error) return reject(error);
+        resolve();
+      })
+    });
   }
 
   addTask(task, priority) {
