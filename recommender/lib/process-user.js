@@ -30,16 +30,12 @@ module.exports = wrap(function* (userId) {
     limit: step
   };
 
-  let usersCount = yield CrawlerAPI.getUserCount();
+  let users = yield CrawlerAPI.getSimilarUsers(userId, options);
+  users = users.map(function(user) {
+    return mapping(user.Playtimes, 'appId', 'value');
+  });
+  recommender.addObjects(users);
 
-  for(options.offset = 0; options.offset < usersCount - 1; options.offset += step) {
-    let users = yield CrawlerAPI.getUserListWithExclude(userId, options);
-    users = users.map(function(user) {
-      return mapping(user.Playtimes, 'appId', 'value');
-    });
-
-    recommender.addObjects(users);
-  }
   log.debug('Processing done');
 
   let recommendations = recommender.getRecommendations();

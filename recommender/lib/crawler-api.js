@@ -9,6 +9,7 @@ const PATHS = {
   userList: '/users',
   totalUsers: '/total-users',
   userListExcl: '/users/not/',
+  similarUsers: '/users/similar/',
   playtime: '/playtimes/',
   playtimeList: '/playtimes',
   app: '/apps/',
@@ -40,6 +41,9 @@ const CrawlerAPI = {
   },
   getUserListWithExclude(id, params = {}) {
     return resource('userListExcl', id).setParams(params).send();
+  },
+  getSimilarUsers: function(id, params = {}) {
+    return resource('similarUsers', id).setParams(params).send();
   },
   getPlaytimeList: function(params = {}) {
     return resource('playtimeList').setParams(params).send();
