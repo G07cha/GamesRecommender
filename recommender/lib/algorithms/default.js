@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 
 const sameEntityCoef = 0.5;
@@ -8,9 +10,7 @@ module.exports = {
     let recommendations = {};
 
     entities.forEach(function(entity) {
-      let entityRecommendations = {};
-
-      [same, different] = _.partition(_.keys(entity), (value) => target[value]);
+      let [same, different] = _.partition(_.keys(entity), (value) => target[value]);
 
       let baseCost = same.length * sameEntityCoef;
 
