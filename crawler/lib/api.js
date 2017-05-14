@@ -112,7 +112,8 @@ router.get('/users/not/:id', function(req, res) {
 });
 
 router.get('/users/similar/:id', function(req, res) {
-  const countFieldName = '"PlaytimesCount"';
+  const countFieldName = 'plcount';
+  let appIds;
 
   return User.findOne({
     where: {
@@ -128,23 +129,37 @@ router.get('/users/similar/:id', function(req, res) {
       throw new Error(`User with id '${req.params.id}' is not found`);
     }
 
-    let appIds = user.Playtimes.map((p) => p.get('appId')).join(',');
+    appIds = user.Playtimes.map((playtime) => playtime.get('appId'));
 
-    return User.findAll({
+    return Playtime.findAll({
       offset: req.query.offset,
       limit: req.query.count,
-      include: [Playtime],
+      where: {
+        appId: {
+          $in: appIds
+        },
+        userId: {
+          $not: req.params.id
+        }
+      },
       attributes: [
-        [sequelize.literal(
-          `(SELECT COUNT(*) FROM "${Playtime.tableName}" WHERE "${Playtime.tableName}"."userId" = "User".id
-            AND "${Playtime.tableName}"."appId" IN (${appIds}))`),
-          countFieldName]
+        [sequelize.literal('COUNT(id)'), countFieldName],
+        'userId'
       ],
-      order: [[sequelize.literal(countFieldName), 'DESC']]
+      order: [[sequelize.literal(countFieldName), 'DESC']],
+      group: ['userId']
     });
-  }).then(function(users) {
-    res.send(users);
-  }).catch(function (err) {
+  }).then(function(playtimes) {
+    return User.findAll({
+      where: {
+        id: {
+          $in: playtimes.map((playtime) => playtime.get('userId'))
+        }
+      },
+      limit: req.query.count,
+      include: [Playtime]
+    });
+  }).then(res.send.bind(res)).catch(function (err) {
     res.status(500).send(err);
   });
 });
