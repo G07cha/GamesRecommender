@@ -5,6 +5,7 @@ const { sequelize, Recommendation } = require('../models');
 const epilogue = require('epilogue');
 const CrawlerAPI = require('./crawler-api');
 const log = require('./logger');
+const pendingJobs = {};
 
 epilogue.initialize({
   app: router,
@@ -24,18 +25,36 @@ recommendationResource.list.fetch.after(function(req, res, context) {
   if(context.instance.length || !context.criteria.userId) {
     return context.continue;
   } else {
-    return CrawlerAPI.getUser(context.criteria.userId).then(function(user) {
+    CrawlerAPI.getUser(context.criteria.userId).then(function(user) {
+      pendingJobs[user.id] = true;
+
       return new Promise(function(resolve, reject) {
         req.app.get('queue').create({
           title: 'Processing ' + user.id,
           id: user.id
-        }, 'high').on('complete', resolve).on('failed', reject);
+        }, 'high').on('complete', function() {
+          delete pendingJobs[user.id];
+          resolve();
+        }).on('failed', reject);
       });
-    }).then(function() {
-      return Recommendation.findAll(context.options).then(function(recommends) {
-        context.instance = recommends;
-        return context.continue;
-      });
+    }).catch(function(err) {
+      res.status(500).send(err);
+    });
+
+    res.sendStatus(202);
+
+    return context.skip;
+  }
+});
+
+router.get('/recommendations/status/:id', function(req, res) {
+  if(pendingJobs[req.params.id]) {
+    res.send({
+      status: 'pending'
+    });
+  } else {
+    res.status(201).send({
+      status: 'done'
     });
   }
 });
