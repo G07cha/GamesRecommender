@@ -19,7 +19,11 @@ function gameListingHandler(req, res) {
       genre: req.query.genre
     });
   }).then(function(games) {
-    res.render('games-listing', { nextPage, prevPage, games });
+    if(games.length) {
+      res.render('games-listing', { nextPage, prevPage, games });
+    } else {
+      res.render('loading');
+    }
   }).catch(function(error) {
     log.error(error);
     res.status(500).render('home', {

@@ -1,0 +1,40 @@
+<div class="loading">
+  <img class="spinner" src="{{domain}}/images/spinner.gif" alt="Loading...">
+  <h2>Please wait!</h2>
+  <span>We are generating recommendations for you for the first time, it will take a few minutes.</span>
+  <br />
+  <span>Once recommendations will be ready you will be redirected to the page with games</span>
+</div>
+<script>
+var pingInterval;
+function startPinging() {
+
+}
+
+function reload() {
+  clearInterval(pingInterval);
+  window.location = '{{domain}}/games';
+}
+
+function ping() {
+  var httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = function() {
+    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest.status === 200) {
+        var body = JSON.parse(httpRequest.responseText);
+
+        if(body.status === 'done') {
+          reload();
+        }
+      } else {
+        console.error('Something went wrong');
+        console.error(httpRequest.responseText);
+      }
+    }
+  };
+  httpRequest.open('GET', '{{domain}}/games/status');
+  httpRequest.send();
+}
+
+pingInterval = setInterval(ping, 3000);
+</script>

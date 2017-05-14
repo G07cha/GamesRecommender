@@ -15,7 +15,8 @@ class UserGames {
     return RecommenderAPI.getRecommendationList({
       userId: this.id
     }).then((recommendations) => {
-      if(recommendations.length === 0) {
+      if(recommendations === 'Accepted') {
+        appIds = [];
         return [];
       }
       appIds = recommendations.map((r) => parseInt(r.appId));
