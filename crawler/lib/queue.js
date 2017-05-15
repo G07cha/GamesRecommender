@@ -17,6 +17,8 @@ class Queue {
     this.settings.redis = config.redis;
     this.q = kue.createQueue(settings);
 
+    this.q.on('error', log.error);
+
     // Create WebUI
     if(process.env.DASHBOARD_PORT) {
       kue.app.listen(process.env.DASHBOARD_PORT);
