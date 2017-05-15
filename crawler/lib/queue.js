@@ -41,6 +41,15 @@ class Queue {
       .save();
   }
 
+  process(task) {
+    return new Promise((resolve, reject) => {
+      this.executor(task, function(err) {
+        if(err) return reject(err);
+        resolve();
+      });
+    });
+  }
+
   start() {
     if(!this.executor) {
       log.warn('Can\'t start, either it is already running or executor is not set')
