@@ -2,9 +2,13 @@
 module.exports = function(sequelize, DataTypes) {
   var Playtime = sequelize.define('Playtime', {
     appId: DataTypes.INTEGER,
-    userId: DataTypes.STRING,
+    userId: DataTypes.BIGINT,
     value: DataTypes.INTEGER
   }, {
+    indexes: [ {
+      method: 'hash',
+      fields: [ 'userId' ]
+    } ],
     classMethods: {
       associate: function(models) {
         Playtime.belongsTo(models.User, {
