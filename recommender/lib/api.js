@@ -53,7 +53,9 @@ router.get('/recommendations', function(req, res) {
       });
     }
   }).catch(function(err) {
-    res.status(500).send(err);
+    if(res.headersSent !== true) {
+      res.status(500).send(err);
+    }
   });
 });
 
