@@ -22,16 +22,16 @@ epilogue.resource({
 });
 
 router.get('/recommendations', function(req, res) {
-  let {count, offset, sort} = req.query;
+  let {count, offset} = req.query;
 
   delete req.query.count;
   delete req.query.offset;
-  delete req.query.sort;
 
   Recommendation.findAll({
     where: req.query,
     limit: count,
-    offset, sort
+    order: [['priority', 'DESC']],
+    offset
   }).then(function(list) {
     if(list.length) {
       res.send(list);

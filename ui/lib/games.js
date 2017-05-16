@@ -19,7 +19,13 @@ class UserGames {
         appIds = [];
         return [];
       }
-      appIds = recommendations.map((r) => parseInt(r.appId));
+      appIds = recommendations.sort(function(a, b) {
+        if(a.priority === b.priority) {
+          return 0;
+        } else {
+          return a.priority > b.priority ? -1 : 1;
+        }
+      }).map((r) => r.appId);
       params.ids = appIds.join(',');
       params.offset = (page - 1) * count;
       params.count = count;
