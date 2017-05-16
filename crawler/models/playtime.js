@@ -5,6 +5,7 @@ module.exports = function(sequelize, DataTypes) {
     userId: DataTypes.BIGINT,
     value: DataTypes.INTEGER
   }, {
+    timestamps: false,
     indexes: [ {
       method: 'hash',
       fields: [ 'userId' ]
