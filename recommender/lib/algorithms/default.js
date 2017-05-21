@@ -2,10 +2,17 @@
 
 const _ = require('lodash');
 
-const sameEntityCoef = 0.5;
-const valueCoef = 0.1;
+let sameEntityCoef = 0.5;
+let valueCoef = 0.1;
 
 module.exports = {
+  getCoefs: function() {
+    return {sameEntityCoef, valueCoef};
+  },
+  setCoefs: function(newCoefs) {
+    sameEntityCoef = newCoefs.sameEntityCoef || sameEntityCoef;
+    valueCoef = valueCoef.sameEntityCoef || valueCoef;
+  },
   process: function(entities, target) {
     let recommendations = {};
 
