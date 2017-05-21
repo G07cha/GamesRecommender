@@ -25,12 +25,10 @@ module.exports = wrap(function* (userId) {
 
   // Go through all users with playtimes and get recommendations
   log.debug('Processing all users');
-  let step = 1000;
-  let options = {
-    limit: step
-  };
 
-  let users = yield CrawlerAPI.getSimilarUsers(userId, options);
+  let users = yield CrawlerAPI.getSimilarUsers(userId, {
+    count: 100
+  });
   users = users.map(function(user) {
     return mapping(user.Playtimes, 'appId', 'value');
   });
