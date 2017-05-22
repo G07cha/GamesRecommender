@@ -10,6 +10,7 @@ function steamIdResolver(req, res) {
     if(req.body.value) {
       // Check if it's already a regular ID
       if(steamIDRegEx.test(req.body.value)) {
+        res.cookie('steamId', req.body.value);
         resolve(req.body.value);
       } else {
         steamAPI.getUserId(req.body.value).then(function(steamId) {
