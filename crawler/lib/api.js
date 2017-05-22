@@ -23,8 +23,10 @@ userResource.read.fetch.before(function(req, res, context) {
     }
 
     return req.app
-      .get('queue')
-      .process(req.params.id);
+      .get('crawler')
+      .process({
+        data: req.params.id
+      });
   }).then(function() {
     return context.continue;
   });

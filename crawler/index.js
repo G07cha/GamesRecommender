@@ -2,7 +2,6 @@
 
 const config = require('./config');
 
-const cluster = require('cluster');
 const { sequelize } = require('./models');
 const log = require('console-log-level')(config.log);
 const Queue = require('./lib/queue');
@@ -11,7 +10,7 @@ const queue = new Queue({
   unique: true
 });
 
-function startMaster() {
+sequelize.authenticate().then(function() {
   const express = require('express');
   const logger = require('morgan');
   const bodyParser = require('body-parser');
@@ -33,9 +32,7 @@ function startMaster() {
 
     log.info('API running at:', host, port);
   });
-}
 
-function startWorker() {
   sequelize.sync().then(function() {
     const Crawler = require('./lib/crawler');
     const crawler = new Crawler(queue);
@@ -43,7 +40,7 @@ function startWorker() {
     // Sample initial point
     crawler.addTask('76561198070651671');
     crawler.start();
-
+    app.set('crawler', crawler);
     process.on('SIGINT', function() {
       log.warning('Caught interrupt signal');
 
@@ -52,13 +49,4 @@ function startWorker() {
       });
     });
   });
-}
-
-sequelize.authenticate().then(function() {
-  if(cluster.isMaster) {
-    startMaster();
-    cluster.fork();
-  } else {
-    startWorker();
-  }
 }).catch(log.error);

@@ -156,7 +156,7 @@ class Crawler {
   }
 
   process(task) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       return this.executor(task, function(error) {
         if(error) return reject(error);
         resolve();
