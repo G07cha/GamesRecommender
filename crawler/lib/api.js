@@ -56,6 +56,7 @@ router.get('/apps', function(req, res) {
     context.criteria.id = {
       $in: req.query.ids.split(',')
     }
+    context.order = context.criteria.id.$in.map((id) => sequelize.literal(`"App".id=${id} DESC`));
     if(req.query.genre) {
       context.count = null;
       context.offset = null;
@@ -66,6 +67,7 @@ router.get('/apps', function(req, res) {
     limit: context.count,
     offset: context.offset,
     attributes: req.query.genre ? [ 'id' ] : null,
+    order: context.order,
     include: [{
       model: Genre,
       where: req.query.genre ? { id: req.query.genre } : null
