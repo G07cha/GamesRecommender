@@ -33,7 +33,7 @@ module.exports = function usersRoutes(router) {
   });
 
   // All users except for one
-  router.get('/users/not/:id', function(req, res) {
+  router.get('/users/not/:id', function(req, res, next) {
     return User.findAll({
       where: {
         id: {
@@ -43,12 +43,10 @@ module.exports = function usersRoutes(router) {
       include: [ Playtime ],
       limit: req.params.limit,
       offset: req.params.offset
-    }).then(res.send.bind(res)).catch(function (err) {
-      res.status(500).send(err);
-    });
+    }).then(res.send.bind(res)).catch(next);
   });
 
-  router.get('/users/similar/:id', function(req, res) {
+  router.get('/users/similar/:id', function(req, res, next) {
     const countFieldName = 'plcount';
     let appIds;
 
@@ -96,16 +94,12 @@ module.exports = function usersRoutes(router) {
         limit: req.query.count,
         include: [Playtime]
       });
-    }).then(res.send.bind(res)).catch(function (err) {
-      res.status(500).send(err);
-    });
+    }).then(res.send.bind(res)).catch(next);
   });
 
-  router.get('/total-users', function(req, res) {
+  router.get('/total-users', function(req, res, next) {
     return User.count().then(function(result) {
       res.send(result.toString());
-    }).catch(function(err) {
-      res.status(500).send(err);
-    });
+    }).catch(next);
   });
 };
