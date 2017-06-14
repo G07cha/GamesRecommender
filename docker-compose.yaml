@@ -37,7 +37,7 @@ services:
     build: ./ui
     volumes:
       - ./ui:/usr/src/app
-    env_file: config.env
+    env_file: ./ui/.env
     environment:
       - PORT=8000
     ports:
