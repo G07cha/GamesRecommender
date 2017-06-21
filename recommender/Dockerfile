@@ -12,4 +12,4 @@ ENV PATH /usr/src/node_modules/.bin:$PATH
 # Bundle app source
 COPY . /usr/src/app
 
-CMD [ "npm", "start" ]
+CMD [ "node", "index.js" ]
