@@ -2,7 +2,7 @@
 
 const config = {
   versionPrefix: '/v1',
-  defaultPort: 80,
+  defaultPort: 3000,
   defaultHost: '0.0.0.0',
   queue: {
     attempts: 3,

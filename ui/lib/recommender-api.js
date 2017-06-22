@@ -1,7 +1,7 @@
 const { resolve } = require('url');
 const request = require('request-promise-native').defaults({
   json: true,
-  baseUrl: 'http://recommender/v1/'
+  baseUrl: 'http://recommender:4000/v1/'
 });
 
 const PATHS = {

@@ -1,7 +1,7 @@
 const { resolve } = require('url');
 const request = require('request-promise-native').defaults({
   json: true,
-  baseUrl: 'http://crawler/v1/'
+  baseUrl: 'http://crawler:3000/v1/'
 });
 
 const PATHS = {
