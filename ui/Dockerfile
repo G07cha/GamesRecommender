@@ -4,6 +4,10 @@ FROM armhf/node:6.10
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+# Set permissions
+RUN chown -R node:node /usr/src
+USER node
+
 # Install app dependencies
 COPY package.json /usr/src/package.json
 RUN cd /usr/src && npm install
