@@ -1,0 +1,15 @@
+.about-container {
+  margin-top: 20%;
+}
+
+.about-container > .header {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+
+.about-container > .description {
+  font-size: 14px;
+  margin: 20px;
+  text-align: center;
+}
